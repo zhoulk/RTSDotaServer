@@ -1,0 +1,11 @@
+{
+	"Gate" : [
+		{"id" : "server-gate-1", "host" : "127.0.0.1", "port" : "7000"}
+	],
+	"Connector" : [
+		{"id" : "server-connector-1", "host" : "127.0.0.1", "port" : "8000"}
+	],
+	"Auth" : [
+		{"id" : "server-auth-1", "host" : "127.0.0.1", "port" : "9000"}
+	]
+}

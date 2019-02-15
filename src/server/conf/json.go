@@ -1,12 +1,13 @@
 package conf
 
 import (
-	"encoding/json"
-	"github.com/name5566/leaf/log"
 	"io/ioutil"
+
+	simplejson "github.com/go-simplejson"
+	"github.com/name5566/leaf/log"
 )
 
-var Server struct{
+var Server struct {
 	LogLevel    string
 	LogPath     string
 	WSAddr      string
@@ -18,14 +19,44 @@ var Server struct{
 	ProfilePath string
 }
 
-func init()  {
-	data, err := ioutil.ReadFile("conf/server.json")
-	if err != nil{
+type ServerItem struct {
+	id   string
+	host string
+	port string
+}
+
+var ServerMap map[string][]ServerItem = make(map[string][]ServerItem)
+
+func init() {
+	log.Debug("json init")
+	data, err := ioutil.ReadFile("conf/serverConfig.json")
+	if err != nil {
 		log.Fatal("%v", err)
 	}
 
-	err = json.Unmarshal(data, &Server)
-	if err != nil{
+	js, err := simplejson.NewJson([]byte(data))
+	if err != nil {
 		log.Fatal("%v", err)
+	}
+
+	m, err := js.Map()
+	if err != nil {
+		log.Fatal("%v", err)
+	}
+
+	for k, v := range m {
+		log.Debug("%v = %v", k, v)
+		var sArr = []ServerItem{}
+		for _, s := range js.Get(k).MustArray() {
+			eachS := s.(map[string]interface{})
+			id := eachS["id"]
+			log.Debug("%v", id)
+
+			sItem := ServerItem{
+				id: eachS["id"].(string),
+			}
+			append(sArr, sItem)
+		}
+		ServerMap[k] = sArr
 	}
 }
