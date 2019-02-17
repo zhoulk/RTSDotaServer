@@ -16,3 +16,6 @@ src/go.opencensus.io/
 src/gopkg.in/mgo.v2/
 src/sourcegraph.com/sqs/goreturns/
 pkg/windows_amd64/server/*/*.a
+bin/*
+*.a
+src/.DS_Store
