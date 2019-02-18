@@ -49,14 +49,17 @@ func init() {
 		var sArr = []ServerItem{}
 		for _, s := range js.Get(k).MustArray() {
 			eachS := s.(map[string]interface{})
-			id := eachS["id"]
-			log.Debug("%v", id)
 
 			sItem := ServerItem{
-				id: eachS["id"].(string),
+				id:   eachS["id"].(string),
+				host: eachS["host"].(string),
+				port: eachS["port"].(string),
 			}
-			append(sArr, sItem)
+			sArr = append(sArr, sItem)
 		}
 		ServerMap[k] = sArr
 	}
+
+	Server.MaxConnNum = 20000
+	Server.TCPAddr = ServerMap["Gate"][0].host + ":" + ServerMap["Gate"][0].port
 }
