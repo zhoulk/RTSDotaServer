@@ -59,8 +59,6 @@ func init() {
 		ServerMap[k] = sArr
 	}
 
-	log.Debug("%v", ServerMap)
-
 	Server.MaxConnNum = 20000
 	Server.TCPAddr = ServerMap["Gate"][0].host + ":" + ServerMap["Gate"][0].port
 }
