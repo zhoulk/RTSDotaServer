@@ -44,12 +44,11 @@ func init() {
 		log.Fatal("%v", err)
 	}
 
-	for k, v := range m {
-		log.Debug("%v = %v", k, v)
-		var sArr = []ServerItem{}
+	for k, _ := range m {
+		// log.Debug("%v = %v", k, v)
+		sArr := []ServerItem{}
 		for _, s := range js.Get(k).MustArray() {
 			eachS := s.(map[string]interface{})
-
 			sItem := ServerItem{
 				id:   eachS["id"].(string),
 				host: eachS["host"].(string),
