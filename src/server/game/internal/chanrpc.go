@@ -12,13 +12,13 @@ func init() {
 }
 
 func rpcNewAgent(args []interface{}) {
-	log.Debug("create agent")
+	log.Debug("[game] create agent")
 	a := args[0].(gate.Agent)
 	_ = a
 }
 
 func rpcCloseAgent(args []interface{}) {
-	log.Debug("close agent")
+	log.Debug("[game] close agent")
 	a := args[0].(gate.Agent)
 	_ = a
 }

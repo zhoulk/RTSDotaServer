@@ -17,7 +17,7 @@ func handler(m interface{}, h interface{}) {
 }
 
 func handleHello(args []interface{}) {
-	// log.Debug("game handleHello")
+	log.Debug("game handleHello")
 
 	// // 收到的 Hello 消息
 	// m := args[0].(*msg.SearchRequest)
