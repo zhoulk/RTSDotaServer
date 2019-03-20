@@ -12,9 +12,11 @@ type Hero struct {
 	Armor        int32
 	Attack       int32
 	Blood        int32
+	SkillIds     []string
+	Skills       []Skill
 }
 
 func (h *Hero) String() string {
-	return fmt.Sprintf("{Id : %s, Name : %s, Level : %d, Strength : %d, Agility : %d, Intelligence : %d, Armor : %d, Attack : %d, Blood : %d }",
-		h.Id, h.Name, h.Level, h.Strength, h.Agility, h.Intelligence, h.Armor, h.Attack, h.Blood)
+	return fmt.Sprintf("{Id : %s, Name : %s, Level : %d, Strength : %d, Agility : %d, Intelligence : %d, Armor : %d, Attack : %d, Blood : %d, Skills : %v }",
+		h.Id, h.Name, h.Level, h.Strength, h.Agility, h.Intelligence, h.Armor, h.Attack, h.Blood, h.Skills)
 }

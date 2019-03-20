@@ -22,6 +22,7 @@ type Module struct {
 	players     map[string]*entry.Player
 	playerHeros map[string][]*entry.Hero
 	heros       []*entry.Hero
+	skills      []*entry.Skill
 }
 
 func (m *Module) OnInit() {
@@ -29,6 +30,7 @@ func (m *Module) OnInit() {
 	m.players = make(map[string]*entry.Player)
 	m.playerHeros = make(map[string][]*entry.Hero)
 	m.heros = InitHeros()
+	m.skills = InitSkills()
 }
 
 func (m *Module) OnDestroy() {
@@ -113,4 +115,43 @@ func InitHeros() []*entry.Hero {
 	log.Debug("%v", heros)
 
 	return heros
+}
+
+func InitSkills() []*entry.Skill {
+	skills := make([]*entry.Skill, 0)
+
+	data, err := ioutil.ReadFile("data/skill.json")
+	if err != nil {
+		log.Fatal("%v", err)
+	}
+
+	js, err := simplejson.NewJson([]byte(data))
+	if err != nil {
+		log.Fatal("%v", err)
+	}
+
+	m, err := js.Array()
+	if err != nil {
+		log.Fatal("%v", err)
+	}
+
+	for _, v := range m {
+		// log.Debug("%v = %v", k, v)
+
+		var skill entry.Skill
+		bytes, err := json.Marshal(v)
+		if err != nil {
+			log.Debug("err was %v", err)
+		}
+		err = json.Unmarshal(bytes, &skill)
+		if err != nil {
+			log.Debug("err was %v", err)
+		}
+
+		skills = append(skills, &skill)
+	}
+
+	log.Debug("%v", skills)
+
+	return skills
 }

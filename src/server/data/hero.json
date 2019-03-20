@@ -8,7 +8,8 @@
         "Intelligence"  : 15,
         "Armor"         : 10,
         "Attack"        : 56,
-        "Blood"         : 620
+        "Blood"         : 620,
+        "SkillIds"      : ["1","2"]
     },
     {
         "Id"            : "2",
@@ -19,6 +20,7 @@
         "Intelligence"  : 15,
         "Armor"         : 12,
         "Attack"        : 66,
-        "Blood"         : 580
+        "Blood"         : 580,
+        "SkillIds"      : ["6"]
     }
 ]
