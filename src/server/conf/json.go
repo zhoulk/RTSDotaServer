@@ -3,8 +3,9 @@ package conf
 import (
 	"io/ioutil"
 
-	simplejson "github.com/go-simplejson"
 	"github.com/name5566/leaf/log"
+
+	simplejson "github.com/go-simplejson"
 )
 
 var Server struct {
@@ -28,7 +29,6 @@ type ServerItem struct {
 var ServerMap map[string][]ServerItem = make(map[string][]ServerItem)
 
 func init() {
-	log.Debug("json init")
 	data, err := ioutil.ReadFile("conf/serverConfig.json")
 	if err != nil {
 		log.Fatal("%v", err)
