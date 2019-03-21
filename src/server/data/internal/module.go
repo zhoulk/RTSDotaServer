@@ -23,6 +23,9 @@ type Module struct {
 	playerHeros map[string][]*entry.Hero
 	heros       []*entry.Hero
 	skills      []*entry.Skill
+	items       []*entry.Item
+	chapters    []*entry.Chapter
+	guanKas     []*entry.GuanKa
 }
 
 func (m *Module) OnInit() {
@@ -31,6 +34,9 @@ func (m *Module) OnInit() {
 	m.playerHeros = make(map[string][]*entry.Hero)
 	m.heros = InitHeros()
 	m.skills = InitSkills()
+	m.items = InitItems()
+	m.chapters = InitChapters()
+	m.guanKas = InitGuanKas()
 }
 
 func (m *Module) OnDestroy() {
@@ -71,6 +77,22 @@ func (m *Module) AllHeros() []*entry.Hero {
 	return m.heros
 }
 
+func (m *Module) AllSkills() []*entry.Skill {
+	return m.skills
+}
+
+func (m *Module) AllItems() []*entry.Item {
+	return m.items
+}
+
+func (m *Module) AllChapters() []*entry.Chapter {
+	return m.chapters
+}
+
+func (m *Module) AllGuanKas() []*entry.GuanKa {
+	return m.guanKas
+}
+
 func (m *Module) AllOwnHeros(player *entry.Player) ([]*entry.Hero, error) {
 	if player == nil || len(player.UserId) == 0 {
 		return nil, errors.New("player is nil or userId length is 0")
@@ -81,20 +103,7 @@ func (m *Module) AllOwnHeros(player *entry.Player) ([]*entry.Hero, error) {
 func InitHeros() []*entry.Hero {
 	heros := make([]*entry.Hero, 0)
 
-	data, err := ioutil.ReadFile("data/hero.json")
-	if err != nil {
-		log.Fatal("%v", err)
-	}
-
-	js, err := simplejson.NewJson([]byte(data))
-	if err != nil {
-		log.Fatal("%v", err)
-	}
-
-	m, err := js.Array()
-	if err != nil {
-		log.Fatal("%v", err)
-	}
+	m, _ := ReadFile("data/json/hero.json")
 
 	for _, v := range m {
 		// log.Debug("%v = %v", k, v)
@@ -120,24 +129,9 @@ func InitHeros() []*entry.Hero {
 func InitSkills() []*entry.Skill {
 	skills := make([]*entry.Skill, 0)
 
-	data, err := ioutil.ReadFile("data/skill.json")
-	if err != nil {
-		log.Fatal("%v", err)
-	}
-
-	js, err := simplejson.NewJson([]byte(data))
-	if err != nil {
-		log.Fatal("%v", err)
-	}
-
-	m, err := js.Array()
-	if err != nil {
-		log.Fatal("%v", err)
-	}
+	m, _ := ReadFile("data/json/skill.json")
 
 	for _, v := range m {
-		// log.Debug("%v = %v", k, v)
-
 		var skill entry.Skill
 		bytes, err := json.Marshal(v)
 		if err != nil {
@@ -154,4 +148,95 @@ func InitSkills() []*entry.Skill {
 	log.Debug("%v", skills)
 
 	return skills
+}
+
+func InitItems() []*entry.Item {
+	items := make([]*entry.Item, 0)
+
+	m, _ := ReadFile("data/json/item.json")
+
+	for _, v := range m {
+		var item entry.Item
+		bytes, err := json.Marshal(v)
+		if err != nil {
+			log.Debug("err was %v", err)
+		}
+		err = json.Unmarshal(bytes, &item)
+		if err != nil {
+			log.Debug("err was %v", err)
+		}
+
+		items = append(items, &item)
+	}
+
+	log.Debug("%v", items)
+
+	return items
+}
+
+func InitChapters() []*entry.Chapter {
+	chapters := make([]*entry.Chapter, 0)
+
+	m, _ := ReadFile("data/json/chapter.json")
+
+	for _, v := range m {
+		var chapter entry.Chapter
+		bytes, err := json.Marshal(v)
+		if err != nil {
+			log.Debug("err was %v", err)
+		}
+		err = json.Unmarshal(bytes, &chapter)
+		if err != nil {
+			log.Debug("err was %v", err)
+		}
+
+		chapters = append(chapters, &chapter)
+	}
+
+	log.Debug("%v", chapters)
+
+	return chapters
+}
+
+func InitGuanKas() []*entry.GuanKa {
+	guanKas := make([]*entry.GuanKa, 0)
+
+	m, _ := ReadFile("data/json/guanKa.json")
+
+	for _, v := range m {
+		var guanKa entry.GuanKa
+		bytes, err := json.Marshal(v)
+		if err != nil {
+			log.Debug("err was %v", err)
+		}
+		err = json.Unmarshal(bytes, &guanKa)
+		if err != nil {
+			log.Debug("err was %v", err)
+		}
+
+		guanKas = append(guanKas, &guanKa)
+	}
+
+	log.Debug("%v", guanKas)
+
+	return guanKas
+}
+
+func ReadFile(path string) ([]interface{}, error) {
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatal("%v", err)
+	}
+
+	js, err := simplejson.NewJson([]byte(data))
+	if err != nil {
+		log.Fatal("%v", err)
+	}
+
+	m, err := js.Array()
+	if err != nil {
+		log.Fatal("%v", err)
+	}
+
+	return m, err
 }

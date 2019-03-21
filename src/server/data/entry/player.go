@@ -12,6 +12,9 @@ type Player struct {
 type BaseInfo struct {
 	Gold    int32
 	Diamond int32
+	Exp     int32
+	Power   int32
+	Level   int32
 }
 
 type ExtendInfo struct {

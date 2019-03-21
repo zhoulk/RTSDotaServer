@@ -1,0 +1,30 @@
+[
+    {
+        "Id" : 1,
+        "Name" : "钢背兽",
+        "ChapterId" : 1,
+        "Earn" : {
+            "ItemIds" : [1, 2],
+            "HeroExp" : 10,
+            "PlayerExp" : 6,
+            "Gold" : 100
+        },
+        "Expend" : {
+            "Power" : 6
+        }
+    },
+    {
+        "Id" : 2,
+        "Name"  : "剑圣",
+        "ChapterId" : 1,
+        "Earn" : {
+            "ItemIds" : [2, 3],
+            "HeroExp" : 20,
+            "PlayerExp" : 12,
+            "Gold" : 110
+        },
+        "Expend" : {
+            "Power" : 6
+        }
+    }
+]
