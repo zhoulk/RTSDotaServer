@@ -6,7 +6,8 @@ type Player struct {
 	Password string
 	Name     string
 
-	BaseInfo *BaseInfo
+	BaseInfo   *BaseInfo
+	ExtendInfo *ExtendInfo
 }
 
 type BaseInfo struct {
@@ -18,4 +19,6 @@ type BaseInfo struct {
 }
 
 type ExtendInfo struct {
+	SelectHeroIds []string
+	SelectHeros   []*Hero
 }

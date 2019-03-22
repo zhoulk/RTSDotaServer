@@ -25,9 +25,13 @@ type Hero struct {
 	Blood            int32
 	SkillIds         []int32
 	Skills           []Skill
+	HeroId           string
+	PlayerId         string
+	IsSelect         bool
+	Pos              int32
 }
 
 func (h *Hero) String() string {
-	return fmt.Sprintf("\n{Id : %d, Name : %s, Level : %d, Type : %d, Strength : %d(+%d), Agility : %d(+%d), Intelligence : %d(+%d), Armor : %d, Attack : (%d~%d), Blood : %d, SkillIds : %v, Skills : %v }",
-		h.Id, h.Name, h.Level, h.Type, h.Strength, h.StrengthStep, h.Agility, h.AgilityStep, h.Intelligence, h.IntelligenceStep, h.Armor, h.AttackMin, h.AttackMax, h.Blood, h.SkillIds, h.Skills)
+	return fmt.Sprintf("\n{Id : %d, Name : %s, Level : %d, IsSelect :%v, Pos : %d, Type : %d, Strength : %d(+%d), Agility : %d(+%d), Intelligence : %d(+%d), Armor : %d, Attack : (%d~%d), Blood : %d, SkillIds : %v, Skills : %v }",
+		h.Id, h.Name, h.Level, h.IsSelect, h.Pos, h.Type, h.Strength, h.StrengthStep, h.Agility, h.AgilityStep, h.Intelligence, h.IntelligenceStep, h.Armor, h.AttackMin, h.AttackMax, h.Blood, h.SkillIds, h.Skills)
 }

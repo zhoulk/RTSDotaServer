@@ -23,6 +23,8 @@ func init() {
 	handler(&msg.ChapterRequest{}, handleAllChapter)
 	handler(&msg.GuanKaRequest{}, handleAllGuanKa)
 	handler(&msg.BattleGuanKaRequest{}, handleBattleGuanKa)
+	handler(&msg.HeroSelectRequest{}, handleHeroSelect)
+	handler(&msg.HeroUnSelectRequest{}, handleHeroUnSelect)
 }
 
 func handler(m interface{}, h interface{}) {
@@ -80,6 +82,8 @@ func handleRandomHero(args []interface{}) {
 			rd := rand.Intn(len(heros))
 			hero := new(entry.Hero)
 			tool.DeepCopy(hero, heros[rd])
+			hero.HeroId = tool.UniqueId()
+			hero.PlayerId = player.UserId
 			data.Module.SavePlayerHero(player, hero)
 			player.BaseInfo.Gold -= 1000
 
@@ -97,6 +101,8 @@ func handleRandomHero(args []interface{}) {
 			rd := rand.Intn(len(heros))
 			hero := new(entry.Hero)
 			tool.DeepCopy(hero, heros[rd])
+			hero.HeroId = tool.UniqueId()
+			hero.PlayerId = player.UserId
 			data.Module.SavePlayerHero(player, hero)
 			player.BaseInfo.Diamond -= 20
 
@@ -114,6 +120,8 @@ func handleRandomHero(args []interface{}) {
 			rd := rand.Intn(len(heros))
 			hero := new(entry.Hero)
 			tool.DeepCopy(hero, heros[rd])
+			hero.HeroId = tool.UniqueId()
+			hero.PlayerId = player.UserId
 			data.Module.SavePlayerHero(player, hero)
 			player.BaseInfo.Diamond -= 200
 
@@ -203,14 +211,13 @@ func handleAllChapter(args []interface{}) {
 	//m := args[0].(*msg.HeroRequest)
 	a := args[1].(gate.Agent)
 
-	// // 输出收到的消息的内容
-	log.Debug("user %v", a.UserData())
+	player := a.UserData().(*entry.Player)
 
 	response := new(msg.ChapterResponse)
 	response.Code = msg.ResponseCode_SUCCESS
 
 	chapters := make([]*msg.Chapter, 0)
-	for _, v := range data.Module.AllChapters() {
+	for _, v := range data.Module.AllChapters(player) {
 		item := ConverChapterToMsgChapter(v)
 		chapters = append(chapters, item)
 	}
@@ -225,14 +232,13 @@ func handleAllGuanKa(args []interface{}) {
 	//m := args[0].(*msg.HeroRequest)
 	a := args[1].(gate.Agent)
 
-	// // 输出收到的消息的内容
-	log.Debug("user %v", a.UserData())
+	player := a.UserData().(*entry.Player)
 
 	response := new(msg.GuanKaResponse)
 	response.Code = msg.ResponseCode_SUCCESS
 
 	guanKas := make([]*msg.GuanKa, 0)
-	for _, v := range data.Module.AllGuanKas() {
+	for _, v := range data.Module.AllGuanKas(player) {
 		guanKa := ConverGuanKaToMsgGuanKa(v)
 		guanKas = append(guanKas, guanKa)
 	}
@@ -244,23 +250,120 @@ func handleAllGuanKa(args []interface{}) {
 func handleBattleGuanKa(args []interface{}) {
 	log.Debug("game handleBattleGuanKa")
 
-	// m := args[0].(*msg.BattleGuanKaRequest)
-	// a := args[1].(gate.Agent)
+	m := args[0].(*msg.BattleGuanKaRequest)
+	a := args[1].(gate.Agent)
 
-	// guanKaId := m.GetGuanKaId()
-	// player := a.UserData().(*entry.Player)
+	guanKaId := m.GetGuanKaId()
+	player := a.UserData().(*entry.Player)
 
-	// // 判断玩家的该关卡是否开启
-	// // 判断体力是否充足
-	// // 判断阵型是否有英雄
-	// // 战斗
+	// 判断玩家的该关卡是否开启
+	guanKa := data.Module.FindGuanKa(player, guanKaId)
+	if !guanKa.IsOpen {
+		response := new(msg.BattleGuanKaResponse)
+		response.Code = msg.ResponseCode_FAIL
+		response.Err = NewErr(define.BattleGuanKaOpenErr)
+		a.WriteMsg(response)
+		return
+	}
+	// 判断体力是否充足
+	if player.BaseInfo.Power < 6 {
+		response := new(msg.BattleGuanKaResponse)
+		response.Code = msg.ResponseCode_FAIL
+		response.Err = NewErr(define.BattlePlayerPowerErr)
+		a.WriteMsg(response)
+		return
+	}
+	// 判断阵型是否有英雄
+	heroIds := data.Module.SelectHeroIds(player)
+	if len(heroIds) == 0 {
+		response := new(msg.BattleGuanKaResponse)
+		response.Code = msg.ResponseCode_FAIL
+		response.Err = NewErr(define.BattleNoneHeroErr)
+		a.WriteMsg(response)
+		return
+	}
+	// 战斗
 
-	// response := new(msg.BattleGuanKaResponse)
-	// response.Code = msg.ResponseCode_SUCCESS
+	response := new(msg.BattleGuanKaResponse)
+	response.Code = msg.ResponseCode_SUCCESS
 
-	// //response.Guanka = guanKas
+	response.Result = define.BattleResult_Success
+	response.Guanka = ConverGuanKaToMsgGuanKa(guanKa)
 
-	// a.WriteMsg(response)
+	a.WriteMsg(response)
+}
+
+func handleHeroSelect(args []interface{}) {
+	log.Debug("game handleHeroSelect")
+	m := args[0].(*msg.HeroSelectRequest)
+	a := args[1].(gate.Agent)
+
+	heroId := m.HeroId
+	pos := m.Pos
+	player := a.UserData().(*entry.Player)
+
+	// 判断玩家是否拥有该英雄
+	hero := data.Module.FindAHero(player, heroId)
+	if hero == nil {
+		response := new(msg.HeroSelectResponse)
+		response.Code = msg.ResponseCode_FAIL
+		response.Err = NewErr(define.HeroSelectExistErr)
+		a.WriteMsg(response)
+		return
+	}
+	// 判断位置是否有效
+	if pos < 1 || pos > 9 {
+		response := new(msg.HeroSelectResponse)
+		response.Code = msg.ResponseCode_FAIL
+		response.Err = NewErr(define.HeroSelectPosErr)
+		a.WriteMsg(response)
+		return
+	}
+	// 上阵
+	// 1. 当前位置是否有英雄，如果有则先自动下阵
+	oldHero := data.Module.FindAHeroAt(player, pos)
+	if oldHero != nil {
+		data.Module.UnSelectHero(player, oldHero)
+	}
+	// 2. 将目标英雄上阵
+	data.Module.SelectHero(player, hero, pos)
+
+	response := new(msg.HeroSelectResponse)
+	response.Code = msg.ResponseCode_SUCCESS
+
+	heroIds := data.Module.SelectHeroIds(player)
+	response.HeroIds = heroIds
+
+	a.WriteMsg(response)
+}
+
+func handleHeroUnSelect(args []interface{}) {
+	log.Debug("game handleHeroUnSelect")
+	m := args[0].(*msg.HeroUnSelectRequest)
+	a := args[1].(gate.Agent)
+
+	heroId := m.HeroId
+	player := a.UserData().(*entry.Player)
+
+	// 判断玩家是否拥有该英雄
+	hero := data.Module.FindAHero(player, heroId)
+	if hero == nil {
+		response := new(msg.HeroUnSelectResponse)
+		response.Code = msg.ResponseCode_FAIL
+		response.Err = NewErr(define.HeroSelectExistErr)
+		a.WriteMsg(response)
+		return
+	}
+	// 下阵
+	data.Module.UnSelectHero(player, hero)
+
+	response := new(msg.HeroUnSelectResponse)
+	response.Code = msg.ResponseCode_SUCCESS
+
+	heroIds := data.Module.SelectHeroIds(player)
+	response.HeroIds = heroIds
+
+	a.WriteMsg(response)
 }
 
 func ConverHeroToMsgHero(v *entry.Hero) *msg.Hero {
@@ -283,6 +386,10 @@ func ConverHeroToMsgHero(v *entry.Hero) *msg.Hero {
 	for _, id := range v.SkillIds {
 		hero.SkillIds = append(hero.SkillIds, tool.String(id))
 	}
+	hero.HeroId = v.HeroId
+	hero.PlayerId = v.PlayerId
+	hero.IsSelect = v.IsSelect
+	hero.Pos = v.Pos
 	return hero
 }
 
@@ -323,6 +430,7 @@ func ConverChapterToMsgChapter(v *entry.Chapter) *msg.Chapter {
 	chapter := new(msg.Chapter)
 	chapter.Id = v.Id
 	chapter.Name = v.Name
+	chapter.IsOpen = v.IsOpen
 	return chapter
 }
 
@@ -331,6 +439,7 @@ func ConverGuanKaToMsgGuanKa(v *entry.GuanKa) *msg.GuanKa {
 	guanKa.Id = v.Id
 	guanKa.Name = v.Name
 	guanKa.ChapterId = v.ChapterId
+	guanKa.IsOpen = v.IsOpen
 	guanKa.Earn = ConverEarnToMsgEarn(v.Earn)
 	guanKa.Expend = ConverExpendToMsgExpend(v.Expend)
 	return guanKa
@@ -351,4 +460,11 @@ func ConverExpendToMsgExpend(v *entry.Expend) *msg.Expend {
 	expend := new(msg.Expend)
 	expend.Power = v.Power
 	return expend
+}
+
+func NewErr(errCode int32) *msg.Error {
+	err := new(msg.Error)
+	err.Code = errCode
+	err.Msg = define.ERRMAP[err.Code]
+	return err
 }

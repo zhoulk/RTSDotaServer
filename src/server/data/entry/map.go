@@ -3,8 +3,9 @@ package entry
 import "fmt"
 
 type Chapter struct {
-	Id   int32
-	Name string
+	Id     int32
+	Name   string
+	IsOpen bool
 }
 
 type GuanKa struct {
@@ -13,6 +14,7 @@ type GuanKa struct {
 	ChapterId int32
 	Earn      *Earn
 	Expend    *Expend
+	IsOpen    bool
 }
 
 type Earn struct {
@@ -28,13 +30,13 @@ type Expend struct {
 }
 
 func (c *Chapter) String() string {
-	return fmt.Sprintf("\n{Id : %d, Name : %s}",
-		c.Id, c.Name)
+	return fmt.Sprintf("\n{Id : %d, Name : %s, IsOpen : %v}",
+		c.Id, c.Name, c.IsOpen)
 }
 
 func (g *GuanKa) String() string {
-	return fmt.Sprintf("\n{Id : %d, Name : %s, ChapterId : %d, Earn : %v, Expend : %v}",
-		g.Id, g.Name, g.ChapterId, g.Earn, g.Expend)
+	return fmt.Sprintf("\n{Id : %d, Name : %s, ChapterId : %d, IsOpen : %v, Earn : %v, Expend : %v}",
+		g.Id, g.Name, g.ChapterId, g.IsOpen, g.Earn, g.Expend)
 }
 
 func (e *Earn) String() string {

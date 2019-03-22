@@ -29,4 +29,8 @@ func init() {
 	Processor.Register(117, &GuanKaResponse{})
 	Processor.Register(118, &BattleGuanKaRequest{})
 	Processor.Register(119, &BattleGuanKaResponse{})
+	Processor.Register(120, &HeroSelectRequest{})
+	Processor.Register(121, &HeroSelectResponse{})
+	Processor.Register(122, &HeroUnSelectRequest{})
+	Processor.Register(123, &HeroUnSelectResponse{})
 }

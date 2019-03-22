@@ -18,4 +18,6 @@ func init() {
 	msg.Processor.SetRouter(&msg.ChapterRequest{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.GuanKaRequest{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.BattleGuanKaRequest{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.HeroSelectRequest{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.HeroUnSelectRequest{}, game.ChanRPC)
 }

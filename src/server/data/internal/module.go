@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"server/base"
 	"server/data/entry"
+	"server/tool"
 
 	"github.com/go-simplejson"
 	"github.com/name5566/leaf/log"
@@ -19,19 +20,23 @@ var (
 
 type Module struct {
 	*module.Skeleton
-	players     map[string]*entry.Player
-	playerHeros map[string][]*entry.Hero
-	heros       []*entry.Hero
-	skills      []*entry.Skill
-	items       []*entry.Item
-	chapters    []*entry.Chapter
-	guanKas     []*entry.GuanKa
+	players        map[string]*entry.Player
+	playerHeros    map[string][]*entry.Hero
+	heros          []*entry.Hero
+	skills         []*entry.Skill
+	items          []*entry.Item
+	chapters       []*entry.Chapter
+	playerChapters map[string][]*entry.Chapter
+	guanKas        []*entry.GuanKa
+	playerGuanKas  map[string][]*entry.GuanKa
 }
 
 func (m *Module) OnInit() {
 	m.Skeleton = skeleton
 	m.players = make(map[string]*entry.Player)
 	m.playerHeros = make(map[string][]*entry.Hero)
+	m.playerChapters = make(map[string][]*entry.Chapter)
+	m.playerGuanKas = make(map[string][]*entry.GuanKa)
 	m.heros = InitHeros()
 	m.skills = InitSkills()
 	m.items = InitItems()
@@ -85,12 +90,38 @@ func (m *Module) AllItems() []*entry.Item {
 	return m.items
 }
 
-func (m *Module) AllChapters() []*entry.Chapter {
-	return m.chapters
+func (m *Module) AllChapters(player *entry.Player) []*entry.Chapter {
+	if player == nil || len(player.UserId) == 0 {
+		return nil
+	}
+	if m.playerChapters[player.UserId] == nil {
+		chapters := make([]*entry.Chapter, 0)
+		ch := m.FindChapterDefine(1)
+		chapter := new(entry.Chapter)
+		tool.DeepCopy(chapter, ch)
+		chapter.IsOpen = true
+		chapters = append(chapters, chapter)
+		m.playerChapters[player.UserId] = chapters
+	}
+
+	return m.playerChapters[player.UserId]
 }
 
-func (m *Module) AllGuanKas() []*entry.GuanKa {
-	return m.guanKas
+func (m *Module) AllGuanKas(player *entry.Player) []*entry.GuanKa {
+	if player == nil || len(player.UserId) == 0 {
+		return nil
+	}
+	if m.playerGuanKas[player.UserId] == nil {
+		guanKas := make([]*entry.GuanKa, 0)
+		gk := m.FindGuanKaDefine(1)
+		guanKa := new(entry.GuanKa)
+		tool.DeepCopy(guanKa, gk)
+		guanKa.IsOpen = true
+		guanKas = append(guanKas, guanKa)
+		m.playerGuanKas[player.UserId] = guanKas
+	}
+
+	return m.playerGuanKas[player.UserId]
 }
 
 func (m *Module) AllOwnHeros(player *entry.Player) ([]*entry.Hero, error) {
@@ -98,6 +129,99 @@ func (m *Module) AllOwnHeros(player *entry.Player) ([]*entry.Hero, error) {
 		return nil, errors.New("player is nil or userId length is 0")
 	}
 	return m.playerHeros[player.UserId], nil
+}
+
+func (m *Module) FindAHero(player *entry.Player, heroId string) *entry.Hero {
+	heros, _ := m.AllOwnHeros(player)
+	if heros != nil {
+		for _, hero := range heros {
+			if hero.HeroId == heroId {
+				return hero
+			}
+		}
+	}
+	return nil
+}
+
+func (m *Module) FindAHeroAt(player *entry.Player, pos int32) *entry.Hero {
+	heros, _ := m.AllOwnHeros(player)
+	if heros != nil {
+		for _, hero := range heros {
+			if hero.Pos == pos {
+				return hero
+			}
+		}
+	}
+	return nil
+}
+
+func (m *Module) RemoveHero(player *entry.Player, heroId string) *entry.Hero {
+	heros, _ := m.AllOwnHeros(player)
+	var oldHero *entry.Hero
+	if heros != nil {
+		target := heros[:0]
+		for _, hero := range heros {
+			if hero.HeroId != heroId {
+				target = append(target, hero)
+			} else {
+				oldHero = hero
+			}
+		}
+	}
+	return oldHero
+}
+
+func (m *Module) UnSelectHero(player *entry.Player, hero *entry.Hero) {
+	hero.IsSelect = false
+	hero.Pos = 0
+}
+
+func (m *Module) SelectHero(player *entry.Player, hero *entry.Hero, pos int32) {
+	hero.IsSelect = true
+	hero.Pos = pos
+}
+
+func (m *Module) SelectHeroIds(player *entry.Player) []string {
+	heros, _ := m.AllOwnHeros(player)
+	heroIds := make([]string, 0)
+	if heros != nil {
+		for _, hero := range heros {
+			if hero.IsSelect {
+				heroIds = append(heroIds, hero.HeroId)
+			}
+		}
+	}
+	return heroIds
+}
+
+func (m *Module) FindChapterDefine(chapterId int32) *entry.Chapter {
+	for _, chapter := range m.chapters {
+		if chapter.Id == chapterId {
+			return chapter
+		}
+	}
+	return nil
+}
+
+func (m *Module) FindGuanKaDefine(guanKaId int32) *entry.GuanKa {
+	for _, guanKa := range m.guanKas {
+		if guanKa.Id == guanKaId {
+			return guanKa
+		}
+	}
+	return nil
+}
+
+func (m *Module) FindGuanKa(player *entry.Player, guanKaId int32) *entry.GuanKa {
+	guanKas := m.AllGuanKas(player)
+	if guanKas != nil {
+		for _, guanKa := range guanKas {
+			if guanKa.Id == guanKaId {
+				return guanKa
+			}
+		}
+	}
+	return nil
 }
 
 func InitHeros() []*entry.Hero {

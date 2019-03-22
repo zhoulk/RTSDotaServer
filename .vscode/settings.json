@@ -1,0 +1,9 @@
+{
+    "search.exclude": {
+        "system/": true,
+        "!/system/**/*.ps*": true
+      },
+      "files.exclude": {
+        "**/CVS": false
+      }
+}
