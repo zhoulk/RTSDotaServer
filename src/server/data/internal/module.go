@@ -72,6 +72,12 @@ func (m *Module) SavePlayerHero(player *entry.Player, hero *entry.Hero) error {
 	if hero == nil {
 		heros = make([]*entry.Hero, 0)
 	}
+	if hero.Skills == nil {
+		hero.Skills = m.FindHeroSkills(hero)
+		if len(hero.Skills) > 0 {
+			hero.Skills[0].IsOpen = true
+		}
+	}
 	heros = append(heros, hero)
 	m.playerHeros[player.UserId] = heros
 
@@ -155,6 +161,31 @@ func (m *Module) FindAHeroAt(player *entry.Player, pos int32) *entry.Hero {
 	return nil
 }
 
+func (m *Module) FindHeroSkills(hero *entry.Hero) []*entry.Skill {
+	skills := make([]*entry.Skill, 0)
+	if hero.SkillIds != nil {
+		for _, skillId := range hero.SkillIds {
+			skill := m.FindASkill(skillId)
+			if skill != nil {
+				skills = append(skills, skill)
+			} else {
+				log.Error("[FindHeroSkills ] skill is not exist , skillId = %v", skillId)
+			}
+		}
+	}
+	return skills
+}
+
+func (m *Module) FindASkill(skillId int32) *entry.Skill {
+	skills := m.AllSkills()
+	for _, skill := range skills {
+		if skillId == skill.Id {
+			return skill
+		}
+	}
+	return nil
+}
+
 func (m *Module) RemoveHero(player *entry.Player, heroId string) *entry.Hero {
 	heros, _ := m.AllOwnHeros(player)
 	var oldHero *entry.Hero
@@ -194,6 +225,19 @@ func (m *Module) SelectHeroIds(player *entry.Player) []string {
 	return heroIds
 }
 
+func (m *Module) SelectHeros(player *entry.Player) []*entry.Hero {
+	heros, _ := m.AllOwnHeros(player)
+	selelctHeros := make([]*entry.Hero, 0)
+	if heros != nil {
+		for _, hero := range heros {
+			if hero.IsSelect {
+				selelctHeros = append(selelctHeros, hero)
+			}
+		}
+	}
+	return selelctHeros
+}
+
 func (m *Module) FindChapterDefine(chapterId int32) *entry.Chapter {
 	for _, chapter := range m.chapters {
 		if chapter.Id == chapterId {
@@ -222,6 +266,10 @@ func (m *Module) FindGuanKa(player *entry.Player, guanKaId int32) *entry.GuanKa 
 		}
 	}
 	return nil
+}
+
+func (m *Module) EffectByEarn(player *entry.Player, earn *entry.Earn) {
+
 }
 
 func InitHeros() []*entry.Hero {

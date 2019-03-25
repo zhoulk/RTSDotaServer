@@ -11,7 +11,42 @@
         },
         "Expend" : {
             "Power" : 6
-        }
+        },
+        "Heros" : [
+            {
+                "Name"          : "地狱领主",
+                "Type"          : 1,
+                "Level"         : 1,
+                "Strength"      : 2300,
+                "StrengthStep"      : 270,
+                "Agility"       : 1700,
+                "AgilityStep"       : 150,
+                "Intelligence"  : 2100,
+                "IntelligenceStep"  : 200,
+                "Armor"         : 100,
+                "AttackMin"     : 5500,
+                "AttackMax"     : 6500,
+                "Blood"         : 587,
+                "Skills"      : [
+                    {
+                        "Id"            : 1,
+                        "Name"          : "死亡缠绕",
+                        "Level"         : 2,
+                        "Type"          : 1,
+                        "Desc"          : "以自身生命为祭，通过死亡缠绕伤害/治疗一个敌方/友方单位。",
+                        "IsOpen"        : true
+                    },
+                    {
+                        "Id"            : 2,
+                        "Name"          : "无光之盾",
+                        "Level"         : 3,
+                        "Type"          : 1,
+                        "Desc"          : "用黑暗能量创造一个盾牌来保护友方的单位，在盾牌消失前吸收一定量的伤害。在盾牌被摧毁或持续时间到后，会给周围500范围内的敌方单位造成伤害。施放时移除目标身上的负面魔法效果。",
+                        "IsOpen"        : true
+                    }
+                ]
+            }
+        ]
     },
     {
         "Id" : 2,

@@ -1,6 +1,8 @@
 package entry
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Chapter struct {
 	Id     int32
@@ -12,6 +14,7 @@ type GuanKa struct {
 	Id        int32
 	Name      string
 	ChapterId int32
+	Heros     []*Hero
 	Earn      *Earn
 	Expend    *Expend
 	IsOpen    bool

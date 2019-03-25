@@ -283,12 +283,16 @@ func handleBattleGuanKa(args []interface{}) {
 		return
 	}
 	// 战斗
+	earn := fightGuanKa(player, guanKa)
+	data.Module.EffectByEarn(player, earn)
 
 	response := new(msg.BattleGuanKaResponse)
 	response.Code = msg.ResponseCode_SUCCESS
 
 	response.Result = define.BattleResult_Success
-	response.Guanka = ConverGuanKaToMsgGuanKa(guanKa)
+	resGuanKa := ConverGuanKaToMsgGuanKa(guanKa)
+	resGuanKa.Earn = ConverEarnToMsgEarn(earn)
+	response.Guanka = resGuanKa
 
 	a.WriteMsg(response)
 }
@@ -400,6 +404,7 @@ func ConverSkillToMsgSkill(v *entry.Skill) *msg.Skill {
 	skill.Level = v.Level
 	skill.Type = v.Type
 	skill.Desc = v.Desc
+	skill.IsOpen = v.IsOpen
 	return skill
 }
 
