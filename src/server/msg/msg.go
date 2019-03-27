@@ -33,4 +33,10 @@ func init() {
 	Processor.Register(121, &HeroSelectResponse{})
 	Processor.Register(122, &HeroUnSelectRequest{})
 	Processor.Register(123, &HeroUnSelectResponse{})
+	Processor.Register(124, &HeroSkillsRequest{})
+	Processor.Register(125, &HeroSkillsResponse{})
+	Processor.Register(126, &HeroItemsRequest{})
+	Processor.Register(127, &HeroItemsResponse{})
+	Processor.Register(128, &SkillUpgradeRequest{})
+	Processor.Register(129, &SkillUpgradeResponse{})
 }

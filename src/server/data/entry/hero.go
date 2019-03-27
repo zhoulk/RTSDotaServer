@@ -40,6 +40,9 @@ type Hero struct {
 	PlayerId         string
 	IsSelect         bool
 	Pos              int32
+	SkillPoint       int32
+	Exp              int32
+	LevelUpExp       int32
 
 	BAT   int32
 	Group int32
@@ -51,6 +54,10 @@ func (h *Hero) String() string {
 }
 
 func (h *Hero) NormalAttack(timer int32, heros []*Hero) {
+	if !h.CanAttack(timer) {
+		return
+	}
+
 	var attackHero *Hero
 	var otherMinBlood int32 = math.MaxInt32
 	for _, hero := range heros {
@@ -76,6 +83,35 @@ func (h *Hero) NormalAttack(timer int32, heros []*Hero) {
 		attackHero.Blood -= effectBlood
 		log.Debug("[Attack ] %d %s(%d) 攻击 %s(%d) 造成 %d 点伤害", timer, h.Name, h.Blood, attackHero.Name, attackHero.Blood, effectBlood)
 	}
+}
+
+func (h *Hero) CanAttack(timer int32) bool {
+	if h.BAT > 0 {
+		if timer%h.BAT == 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func (h *Hero) EffectByEarn(earn *Earn) {
+	h.Exp += earn.HeroExp
+	for {
+		if h.Exp < h.LevelUpExp {
+			break
+		}
+		if h.Level+1 >= int32(len(heroExpList)) {
+			break
+		}
+		h.levelUp()
+	}
+}
+
+func (h *Hero) levelUp() {
+	h.Exp -= h.LevelUpExp
+	h.Level += 1
+	h.SkillPoint += 1
+	h.LevelUpExp = heroExpList[h.Level]
 }
 
 type SortByBAT []*Hero

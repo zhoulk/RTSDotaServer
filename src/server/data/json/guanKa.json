@@ -24,8 +24,8 @@
                 "Intelligence"  : 2100,
                 "IntelligenceStep"  : 200,
                 "Armor"         : 100,
-                "AttackMin"     : 5500,
-                "AttackMax"     : 6500,
+                "AttackMin"     : 1500,
+                "AttackMax"     : 2500,
                 "Blood"         : 587,
                 "Skills"      : [
                     {
@@ -34,7 +34,7 @@
                         "Level"         : 2,
                         "Type"          : 1,
                         "Desc"          : "以自身生命为祭，通过死亡缠绕伤害/治疗一个敌方/友方单位。",
-                        "IsOpen"        : true
+                        "IsOpen"        : false
                     },
                     {
                         "Id"            : 2,

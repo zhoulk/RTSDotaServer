@@ -9,6 +9,9 @@ type Item struct {
 	Effect string
 	Desc   string
 	Mixs   []*Mix
+
+	HeroId string
+	ItemId string
 }
 
 type Mix struct {

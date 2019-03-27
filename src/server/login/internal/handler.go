@@ -45,11 +45,7 @@ func handleRegiste(args []interface{}) {
 	player.Password = m.GetPassword()
 	player.Name = m.GetAccount()
 
-	baseInfo := new(entry.BaseInfo)
-	baseInfo.Gold = 10000
-	baseInfo.Diamond = 1000
-	baseInfo.Level = 1
-	baseInfo.Power = 120
+	baseInfo := entry.NewBaseInfo()
 	player.BaseInfo = baseInfo
 
 	data.Module.SavePlayer(player)
@@ -98,6 +94,8 @@ func ConverBaseInfoToMsgBaseInfo(v *entry.BaseInfo) *msg.BaseInfo {
 	baseInfo.Diamond = v.Diamond
 	baseInfo.Exp = v.Exp
 	baseInfo.Power = v.Power
+	baseInfo.LevelUpExp = v.LevelUpExp
+	baseInfo.MaxPower = v.MaxPower
 	return baseInfo
 }
 

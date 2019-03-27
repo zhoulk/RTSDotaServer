@@ -14,6 +14,9 @@ const (
 	BattleGuanKaOpenErr  int32 = 200
 	BattlePlayerPowerErr int32 = 201
 	BattleNoneHeroErr    int32 = 202
+
+	SkillUpgradeExistErr int32 = 300
+	SkillUpgradeSPErr    int32 = 301
 )
 
 var ERRMAP map[int32]string = map[int32]string{
@@ -30,6 +33,9 @@ var ERRMAP map[int32]string = map[int32]string{
 	BattleGuanKaOpenErr:  "关卡未开启",
 	BattlePlayerPowerErr: "体力不足",
 	BattleNoneHeroErr:    "没有上阵英雄",
+
+	SkillUpgradeExistErr: "技能不存在",
+	SkillUpgradeSPErr:    "技能点不足",
 }
 
 const (

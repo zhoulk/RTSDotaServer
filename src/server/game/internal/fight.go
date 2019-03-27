@@ -10,8 +10,8 @@ import (
 	"github.com/name5566/leaf/log"
 )
 
-func fightGuanKa(player *entry.Player, gk *entry.GuanKa) *entry.Earn {
-	earn := new(entry.Earn)
+func fightGuanKa(player *entry.Player, gk *entry.GuanKa) bool {
+	isWin := false
 
 	// 获取己方英雄
 	selfHeros := data.Module.SelectHeros(player)
@@ -27,6 +27,7 @@ func fightGuanKa(player *entry.Player, gk *entry.GuanKa) *entry.Earn {
 		h := new(entry.Hero)
 		tool.DeepCopy(h, hero)
 		h.Group = 1
+		h.BAT = define.FIGHT_BASE_ATTACK_TIME
 		fightHeros = append(fightHeros, h)
 	}
 
@@ -34,6 +35,7 @@ func fightGuanKa(player *entry.Player, gk *entry.GuanKa) *entry.Earn {
 		h := new(entry.Hero)
 		tool.DeepCopy(h, hero)
 		h.Group = 2
+		h.BAT = define.FIGHT_BASE_ATTACK_TIME
 		fightHeros = append(fightHeros, h)
 	}
 
@@ -72,6 +74,8 @@ func fightGuanKa(player *entry.Player, gk *entry.GuanKa) *entry.Earn {
 				anyOneDie = true
 			}
 		}
+		fightHeros = target
+
 		if anyOneDie {
 			// 装备属性生效
 			EquipEffect(fightHeros)
@@ -85,6 +89,9 @@ func fightGuanKa(player *entry.Player, gk *entry.GuanKa) *entry.Earn {
 			res[hero.Group] = true
 		}
 		if len(res) <= 1 {
+			if res[selfHeros[0].Group] {
+				isWin = true
+			}
 			break
 		}
 		if timer >= define.FIGHT_MAX_DURATION {
@@ -92,36 +99,31 @@ func fightGuanKa(player *entry.Player, gk *entry.GuanKa) *entry.Earn {
 		}
 	}
 
-	// 计算收益
-	// 随机物品奖励
-
-	earn.Gold = 1000
-	earn.HeroExp = 200
-	return earn
+	return isWin
 }
 
 func EquipEffect(fightHeros []*entry.Hero) {
-	log.Debug("[fifht ] equip effect begin ")
+	log.Debug("[fight ] equip effect begin ")
 	for _, hero := range fightHeros {
 		if hero.Equips != nil {
 			for _, equip := range hero.Equips {
-				log.Debug("[fifht ] equip effect %v ", equip)
+				log.Debug("[fight ] equip effect %v ", equip)
 			}
 		}
 	}
-	log.Debug("[fifht ] equip effect end ")
+	log.Debug("[fight ] equip effect end ")
 }
 
 func PassiveEffect(fightHeros []*entry.Hero) {
-	log.Debug("[fifht ] skill effect begin ")
+	log.Debug("[fight ] skill effect begin ")
 	for _, hero := range fightHeros {
 		if hero.Skills != nil {
 			for _, skill := range hero.Skills {
 				if skill.Type == entry.SkillTypePassive && skill.IsOpen {
-					log.Debug("[fifht ] skill effect %v ", skill)
+					log.Debug("[fight ] skill effect %v ", skill)
 				}
 			}
 		}
 	}
-	log.Debug("[fifht ] skill effect end ")
+	log.Debug("[fight ] skill effect end ")
 }
