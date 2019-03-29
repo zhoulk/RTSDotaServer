@@ -6,7 +6,16 @@ import (
 )
 
 func (m *Module) FindPlayer(account string, pwd string) *entry.Player {
-	return m.players[account+"-"+pwd]
+	player := m.players[account+"-"+pwd]
+	if player == nil {
+		for _, p := range m.players {
+			if p.UserId == account {
+				player = p
+				break
+			}
+		}
+	}
+	return player
 }
 
 func (m *Module) SavePlayer(player *entry.Player) error {

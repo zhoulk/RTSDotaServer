@@ -39,4 +39,6 @@ func init() {
 	Processor.Register(127, &HeroItemsResponse{})
 	Processor.Register(128, &SkillUpgradeRequest{})
 	Processor.Register(129, &SkillUpgradeResponse{})
+	Processor.Register(130, &ZoneRequest{})
+	Processor.Register(131, &ZoneResponse{})
 }

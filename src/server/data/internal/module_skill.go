@@ -33,5 +33,6 @@ func (m *Module) FindHeroSkill(player *entry.Player, skillId string) (*entry.Her
 
 func (m *Module) SkillUpgrade(hero *entry.Hero, skill *entry.Skill) {
 	skill.Level += 1
+	skill.IsOpen = true
 	hero.SkillPoint -= 1
 }

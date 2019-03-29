@@ -1,36 +1,25 @@
-package conf
+package entry
 
 import (
 	"encoding/json"
 	"io/ioutil"
 
+	"github.com/go-simplejson"
 	"github.com/name5566/leaf/log"
-
-	simplejson "github.com/go-simplejson"
 )
 
-var Server struct {
-	LogLevel    string
-	LogPath     string
-	WSAddr      string
-	CertFile    string
-	KeyFile     string
-	TCPAddr     string
-	MaxConnNum  int
-	ConsolePort int
-	ProfilePath string
-}
-
-type ServerItem struct {
+type Zone struct {
 	Id         string
 	TCPAddr    string
 	MaxConnNum int
+	Name       string
+	IsNew      bool
 }
 
-var ServerMap map[string]*ServerItem = make(map[string]*ServerItem)
+var ZoneList []*Zone = make([]*Zone, 0)
 
 func init() {
-	data, err := ioutil.ReadFile("conf/serverList.json")
+	data, err := ioutil.ReadFile("data/json/zone.json")
 	if err != nil {
 		log.Fatal("%v", err)
 	}
@@ -47,16 +36,16 @@ func init() {
 
 	for _, v := range m {
 		// log.Debug("%v = %v", k, v)
-		var item *ServerItem
+		var z *Zone
 		bytes, err := json.Marshal(v)
 		if err != nil {
 			log.Debug("err was %v", err)
 		}
-		err = json.Unmarshal(bytes, &item)
+		err = json.Unmarshal(bytes, &z)
 		if err != nil {
 			log.Debug("err was %v", err)
 		}
-		ServerMap[item.Id] = item
+		ZoneList = append(ZoneList, z)
 	}
 
 	// Server.MaxConnNum = 20000

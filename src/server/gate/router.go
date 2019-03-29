@@ -9,6 +9,7 @@ import (
 func init() {
 	msg.Processor.SetRouter(&msg.LoginRequest{}, login.ChanRPC)
 	msg.Processor.SetRouter(&msg.RegisteRequest{}, login.ChanRPC)
+	msg.Processor.SetRouter(&msg.ZoneRequest{}, login.ChanRPC)
 
 	msg.Processor.SetRouter(&msg.HeroRequest{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.HeroRandomRequest{}, game.ChanRPC)

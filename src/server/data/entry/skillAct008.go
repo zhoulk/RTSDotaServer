@@ -7,30 +7,30 @@ import (
 )
 
 /*
-魔法箭
+复仇光环
 
-主动技能
+被动技能
 
-等级1:造成100点的伤害，晕眩1.45秒。 施法间隔:10秒 施法消耗:110点魔法
-等级2:造成175点的伤害，晕眩1.55秒。 施法间隔:10秒 施法消耗:120点魔法
-等级3:造成250点的伤害，晕眩1.65秒。 施法间隔:10秒 施法消耗:130点魔法
-等级4:造成325点的伤害，晕眩1.75秒。 施法间隔:10秒 施法消耗:140点魔法"
+"等级 1 - 增加12%的基础攻击力。
+等级 2 - 增加20%的基础攻击力。
+等级 3 - 增加28%的基础攻击力。
+等级 4 - 增加36%的基础攻击力。"
 
-向一个敌方单位射出魔法箭，眩晕并造成伤害。
+复仇之魂的存在提高了附近友方单位的物理攻击力。
 
 */
 
-type SkillAct006 struct {
+type SkillAct008 struct {
 }
 
-func (a SkillAct006) IsCoolDown(timer int32, skill *Skill) bool {
+func (a SkillAct008) IsCoolDown(timer int32, skill *Skill) bool {
 	if timer%10000 == 0 {
 		return true
 	}
 	return false
 }
 
-func (a SkillAct006) Attack(timer int32, skill *Skill, from *Hero, heros []*Hero) bool {
+func (a SkillAct008) Attack(timer int32, skill *Skill, from *Hero, heros []*Hero) bool {
 	selfGroup := from.Group
 	var expendMP int32 = 0
 	var effectBlood int32 = 0
@@ -57,7 +57,7 @@ func (a SkillAct006) Attack(timer int32, skill *Skill, from *Hero, heros []*Hero
 		dizzyDuration = 1750
 		break
 	default:
-		log.Fatal("[SkillAct006 Attack] Error skill.Level = %d", skill.Level)
+		log.Fatal("[SkillAct008 Attack] Error skill.Level = %d", skill.Level)
 		break
 	}
 

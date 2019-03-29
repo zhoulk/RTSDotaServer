@@ -31,6 +31,8 @@ func InitHeros() []*entry.Hero {
 		hero.Level = 1
 		hero.LevelUpExp = 90
 		hero.SkillPoint = 1
+		hero.MaxBlood = hero.Blood
+		hero.MaxMP = hero.MP
 		heros = append(heros, &hero)
 	}
 

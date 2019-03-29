@@ -1,23 +1,41 @@
 package main
 
 import (
+	"flag"
+	"server/conf"
 	"server/data"
+	"server/data/entry"
 	"server/game"
 	"server/gate"
 	"server/login"
 
 	"github.com/name5566/leaf"
+	"github.com/name5566/leaf/log"
 )
 
 func main() {
 
-	// var t string
-	// flag.StringVar(&t, "t", "", "server type")
+	var serverId string
+	flag.StringVar(&serverId, "s", "", "server id")
 	// var num int
 	// flag.IntVar(&num, "num", 0, "server num")
 
-	// flag.Parse()
-	// log.Debug("[Start] %v[%v]", t, num)
+	flag.Parse()
+	var zone *entry.Zone
+	for _, z := range entry.ZoneList {
+		if z.Id == serverId {
+			zone = z
+			break
+		}
+	}
+	if zone == nil {
+		log.Fatal("[Start ] serverId is invalid !  serverId = %v", serverId)
+	}
+
+	log.Debug("[Start] %v[%v]", serverId, zone)
+
+	conf.Server.MaxConnNum = zone.MaxConnNum
+	conf.Server.TCPAddr = zone.TCPAddr
 
 	// lconf.LogLevel = conf.Server.LogLevel
 	// lconf.LogPath = conf.Server.LogPath

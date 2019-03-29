@@ -4,6 +4,7 @@ import (
 	"server/base"
 	"server/data/entry"
 
+	"github.com/name5566/leaf/log"
 	"github.com/name5566/leaf/module"
 )
 
@@ -43,6 +44,7 @@ func (m *Module) OnDestroy() {
 }
 
 func (m *Module) EffectByEarn(player *entry.Player, earn *entry.Earn) {
+	log.Debug("[Module EffectByEarn ] %v", earn)
 	// 角色升级
 	player.EffectByEarn(earn)
 	// 英雄升级

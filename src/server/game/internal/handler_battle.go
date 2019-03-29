@@ -47,6 +47,7 @@ func handleBattleGuanKa(args []interface{}) {
 	}
 	// 战斗
 	res := fightGuanKa(player, guanKa)
+	log.Debug("[handler_battle ] fightGuanKa guanKaIs = %d %v", guanKa.Id, res)
 	// 计算收益
 	earn := CalGuanKaEarn(guanKa, res)
 	// 收益生效

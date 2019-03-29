@@ -7,30 +7,33 @@ import (
 )
 
 /*
-魔法箭
+移形换位
 
 主动技能
 
-等级1:造成100点的伤害，晕眩1.45秒。 施法间隔:10秒 施法消耗:110点魔法
-等级2:造成175点的伤害，晕眩1.55秒。 施法间隔:10秒 施法消耗:120点魔法
-等级3:造成250点的伤害，晕眩1.65秒。 施法间隔:10秒 施法消耗:130点魔法
-等级4:造成325点的伤害，晕眩1.75秒。 施法间隔:10秒 施法消耗:140点魔法"
+45
 
-向一个敌方单位射出魔法箭，眩晕并造成伤害。
+"等级 1 - 施法距离700。
+等级 2 - 施法距离950。
+等级 3 - 施法距离1200。"
+
+"与一个目标英雄瞬间交换位置，无论敌我。移形换位打断目标的持续施法。 可用神杖升级。
+如果你将目标移形换位到一个不可到达的区域，该目标将拥有5秒无视地形的能力
+神杖效果：使大招CD时间由45秒变为10秒"
 
 */
 
-type SkillAct006 struct {
+type SkillAct009 struct {
 }
 
-func (a SkillAct006) IsCoolDown(timer int32, skill *Skill) bool {
+func (a SkillAct009) IsCoolDown(timer int32, skill *Skill) bool {
 	if timer%10000 == 0 {
 		return true
 	}
 	return false
 }
 
-func (a SkillAct006) Attack(timer int32, skill *Skill, from *Hero, heros []*Hero) bool {
+func (a SkillAct009) Attack(timer int32, skill *Skill, from *Hero, heros []*Hero) bool {
 	selfGroup := from.Group
 	var expendMP int32 = 0
 	var effectBlood int32 = 0
@@ -57,7 +60,7 @@ func (a SkillAct006) Attack(timer int32, skill *Skill, from *Hero, heros []*Hero
 		dizzyDuration = 1750
 		break
 	default:
-		log.Fatal("[SkillAct006 Attack] Error skill.Level = %d", skill.Level)
+		log.Fatal("[SkillAct009 Attack] Error skill.Level = %d", skill.Level)
 		break
 	}
 

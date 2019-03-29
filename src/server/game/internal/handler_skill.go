@@ -43,7 +43,7 @@ func handleSkillUpgrade(args []interface{}) {
 
 	hero, skill := data.Module.FindHeroSkill(player, skillId)
 	if skill == nil {
-		response := new(msg.SkillResponse)
+		response := new(msg.SkillUpgradeResponse)
 		response.Code = msg.ResponseCode_FAIL
 		err := new(msg.Error)
 		err.Code = define.SkillUpgradeExistErr
@@ -54,7 +54,7 @@ func handleSkillUpgrade(args []interface{}) {
 	}
 
 	if hero.SkillPoint == 0 {
-		response := new(msg.SkillResponse)
+		response := new(msg.SkillUpgradeResponse)
 		response.Code = msg.ResponseCode_FAIL
 		err := new(msg.Error)
 		err.Code = define.SkillUpgradeSPErr
@@ -66,7 +66,7 @@ func handleSkillUpgrade(args []interface{}) {
 
 	data.Module.SkillUpgrade(hero, skill)
 
-	response := new(msg.SkillResponse)
+	response := new(msg.SkillUpgradeResponse)
 	response.Code = msg.ResponseCode_SUCCESS
 	a.WriteMsg(response)
 }

@@ -11,7 +11,7 @@ import (
 const (
 	HeroTypeStrength     int32 = 1
 	HeroTypeAgility      int32 = 2
-	HeroRandomDiamondErr int32 = 3
+	HeroTypeIntelligence int32 = 3
 )
 
 type Hero struct {
@@ -46,11 +46,85 @@ type Hero struct {
 
 	BAT   int32
 	Group int32
+
+	Buffs    []*Buff
+	TempAttr *TempAttr
+}
+
+const (
+	// 晕眩
+	Buff_Dizzy int32 = 1
+	// 减甲
+	Buff_ReduceArmor int32 = 2
+)
+
+type Buff struct {
+	Id       int32
+	Type     int32
+	Duration int32
+	Start    int32
+	Value    []int32
+}
+
+type TempAttr struct {
+	Strength     int32
+	Agility      int32
+	Intelligence int32
+	Armor        int32
+	Attack       int32
 }
 
 func (h *Hero) String() string {
 	return fmt.Sprintf("\n{Id : %d, Name : %s, Level : %d, IsSelect :%v, Pos : %d, Type : %d, Strength : %d(+%d), Agility : %d(+%d), Intelligence : %d(+%d), Armor : %d, Attack : (%d~%d), Blood : (%d / %d), MP : (%d / %d), BAT : %d, SkillIds : %v, Skills : %v }",
 		h.Id, h.Name, h.Level, h.IsSelect, h.Pos, h.Type, h.Strength, h.StrengthStep, h.Agility, h.AgilityStep, h.Intelligence, h.IntelligenceStep, h.Armor, h.AttackMin, h.AttackMax, h.Blood, h.MaxBlood, h.MP, h.MaxMP, h.BAT, h.SkillIds, h.Skills)
+}
+
+func (h *Hero) RealArmor() int32 {
+	armor := h.Armor
+	if h.TempAttr != nil {
+		armor += h.TempAttr.Armor
+	}
+	return armor
+}
+
+func (h *Hero) RealAttackMin() int32 {
+	attackMin := h.AttackMin
+	if h.TempAttr != nil {
+		attackMin += h.TempAttr.Attack
+	}
+	return attackMin
+}
+
+func (h *Hero) RealAttackMax() int32 {
+	attackMax := h.AttackMax
+	if h.TempAttr != nil {
+		attackMax += h.TempAttr.Attack
+	}
+	return attackMax
+}
+
+func (h *Hero) CheckBuff(timer int32) {
+	if h.Buffs != nil {
+		target := h.Buffs[:0]
+		for _, buff := range h.Buffs {
+			if buff.Start+buff.Duration >= timer {
+				target = append(target, buff)
+			}
+		}
+		h.Buffs = target
+	}
+
+	// 计算 Buff 增益
+	h.MakeTempAttri()
+	if h.Buffs != nil {
+		for _, buff := range h.Buffs {
+			switch buff.Type {
+			case Buff_ReduceArmor:
+				h.TempAttr.Armor -= buff.Value[0]
+				break
+			}
+		}
+	}
 }
 
 func (h *Hero) NormalAttack(timer int32, heros []*Hero) {
@@ -71,13 +145,13 @@ func (h *Hero) NormalAttack(timer int32, heros []*Hero) {
 
 	var effectBlood int32 = 0
 	if attackHero != nil {
-		selfAttack := h.AttackMin + rand.Int31n(h.AttackMax-h.AttackMin)
-		if attackHero.Armor >= 0 {
-			reduce := float32(attackHero.Armor/100*6) / float32(100+attackHero.Armor/100*6)
+		selfAttack := h.RealAttackMin() + rand.Int31n(h.RealAttackMax()-h.RealAttackMin())
+		if attackHero.RealArmor() >= 0 {
+			reduce := float32(attackHero.RealArmor()/100*6) / float32(100+attackHero.RealArmor()/100*6)
 			effectBlood = int32(float32(selfAttack) * (float32(1) - reduce) / 100)
 		} else {
-			deeper := float64(2) - math.Pow(0.94, float64(attackHero.Armor/100))
-			effectBlood = int32(float64(selfAttack) * (float64(1) + deeper) / 100)
+			deeper := float64(2) - math.Pow(0.94, float64(math.Abs(float64(attackHero.RealArmor()))/100))
+			effectBlood = int32(float64(selfAttack) * deeper / 100)
 		}
 
 		attackHero.Blood -= effectBlood
@@ -86,6 +160,14 @@ func (h *Hero) NormalAttack(timer int32, heros []*Hero) {
 }
 
 func (h *Hero) CanAttack(timer int32) bool {
+	// 判断buff 影响
+	if h.Buffs != nil {
+		for _, buff := range h.Buffs {
+			if buff.Type == Buff_Dizzy {
+				return false
+			}
+		}
+	}
 	if h.BAT > 0 {
 		if timer%h.BAT == 0 {
 			return true
@@ -111,7 +193,59 @@ func (h *Hero) levelUp() {
 	h.Exp -= h.LevelUpExp
 	h.Level += 1
 	h.SkillPoint += 1
+	h.Strength += h.StrengthStep
+	h.Agility += h.AgilityStep
+	h.Intelligence += h.IntelligenceStep
+	h.MaxBlood += h.StrengthStep * 25 / 100
+	h.Blood = h.MaxBlood
+	h.MaxMP += h.IntelligenceStep * 20 / 100
+	h.MP = h.MaxMP
+
+	switch h.Type {
+	case HeroTypeStrength:
+		h.AttackMin += h.StrengthStep
+		h.AttackMax += h.StrengthStep
+		break
+	case HeroTypeAgility:
+		h.AttackMin += h.AgilityStep
+		h.AttackMax += h.AgilityStep
+		break
+	case HeroTypeIntelligence:
+		h.AttackMin += h.IntelligenceStep
+		h.AttackMax += h.IntelligenceStep
+		break
+	}
 	h.LevelUpExp = heroExpList[h.Level]
+}
+
+func (h *Hero) AddBuff(buff *Buff) {
+	h.MakeBuffers()
+	buff.Id = int32(len(h.Buffs))
+	h.Buffs = append(h.Buffs, buff)
+}
+
+func (h *Hero) RemoveBuff(buff *Buff) {
+	if h.Buffs != nil {
+		target := h.Buffs[:0]
+		for _, buf := range h.Buffs {
+			if buff.Id != buf.Id {
+				target = append(target, buf)
+			}
+		}
+		h.Buffs = target
+	}
+}
+
+func (h *Hero) MakeBuffers() {
+	if h.Buffs == nil {
+		h.Buffs = make([]*Buff, 0)
+	}
+}
+
+func (h *Hero) MakeTempAttri() {
+	if h.TempAttr == nil {
+		h.TempAttr = new(TempAttr)
+	}
 }
 
 type SortByBAT []*Hero

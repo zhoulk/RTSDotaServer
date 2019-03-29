@@ -1,0 +1,29 @@
+[
+	{
+		"Id": "1",
+		"LogLevel": "debug",
+		"LogPath": "",
+		"TCPAddr": "127.0.0.1:7000",
+		"MaxConnNum": 20000,
+		"Name":"(1区)铁干树枝",
+		"IsNew" : false
+	},
+	{
+		"Id": "2",
+		"LogLevel": "debug",
+		"LogPath": "",
+		"TCPAddr": "127.0.0.1:7001",
+		"MaxConnNum": 20000,
+		"Name" : "(2区)治疗药膏",
+		"IsNew" : false
+	},
+	{
+		"Id": "3",
+		"LogLevel": "debug",
+		"LogPath": "",
+		"TCPAddr": "127.0.0.1:7002",
+		"MaxConnNum": 20000,
+		"Name" : "(3区)净化药水",
+		"IsNew" : true
+	}
+]

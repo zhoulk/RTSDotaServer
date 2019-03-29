@@ -44,22 +44,25 @@ func (m *Module) FindAHeroAt(player *entry.Player, pos int32) *entry.Hero {
 }
 
 func (m *Module) FindHeroSkills(hero *entry.Hero) []*entry.Skill {
-	skills := make([]*entry.Skill, 0)
-	if hero.SkillIds != nil {
-		for _, skillId := range hero.SkillIds {
-			skill := m.FindASkill(skillId)
-			if skill != nil {
-				sk := new(entry.Skill)
-				tool.DeepCopy(sk, skill)
-				sk.HeroId = hero.HeroId
-				sk.SkillId = tool.UniqueId()
-				skills = append(skills, sk)
-			} else {
-				log.Error("[FindHeroSkills ] skill is not exist , skillId = %v", skillId)
+	if hero.Skills == nil {
+		skills := make([]*entry.Skill, 0)
+		if hero.SkillIds != nil {
+			for _, skillId := range hero.SkillIds {
+				skill := m.FindASkill(skillId)
+				if skill != nil {
+					sk := new(entry.Skill)
+					tool.DeepCopy(sk, skill)
+					sk.HeroId = hero.HeroId
+					sk.SkillId = tool.UniqueId()
+					skills = append(skills, sk)
+				} else {
+					log.Error("[FindHeroSkills ] skill is not exist , skillId = %v", skillId)
+				}
 			}
 		}
+		hero.Skills = skills
 	}
-	return skills
+	return hero.Skills
 }
 
 func (m *Module) RemoveHero(player *entry.Player, heroId string) *entry.Hero {

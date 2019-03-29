@@ -15,6 +15,7 @@ import (
 func init() {
 	handleMsg(&msg.RegisteRequest{}, handleRegiste)
 	handleMsg(&msg.LoginRequest{}, handleAuth)
+	handleMsg(&msg.ZoneRequest{}, handleAllZone)
 }
 
 func handleMsg(m interface{}, h interface{}) {
@@ -68,6 +69,7 @@ func handleAuth(args []interface{}) {
 		response.Code = msg.ResponseCode_FAIL
 		response.Err = NewErr(define.LoginLoginNotExistErr)
 		a.WriteMsg(response)
+		return
 	}
 
 	log.Debug("user exist ", player.UserId, player.Name)
@@ -76,6 +78,20 @@ func handleAuth(args []interface{}) {
 	response.Player = ConverPlayerToMsgPlayer(player)
 
 	a.SetUserData(player)
+	a.WriteMsg(response)
+}
+
+func handleAllZone(args []interface{}) {
+	a := args[1].(gate.Agent)
+
+	response := new(msg.ZoneResponse)
+
+	response.Code = msg.ResponseCode_SUCCESS
+	response.Zones = make([]*msg.Zone, 0)
+	for _, z := range entry.ZoneList {
+		response.Zones = append(response.Zones, ConverZoneToMsgZone(z))
+	}
+
 	a.WriteMsg(response)
 }
 
@@ -97,6 +113,14 @@ func ConverBaseInfoToMsgBaseInfo(v *entry.BaseInfo) *msg.BaseInfo {
 	baseInfo.LevelUpExp = v.LevelUpExp
 	baseInfo.MaxPower = v.MaxPower
 	return baseInfo
+}
+
+func ConverZoneToMsgZone(v *entry.Zone) *msg.Zone {
+	zone := new(msg.Zone)
+	zone.Id = v.Id
+	zone.Name = v.Name
+	zone.IsNew = v.IsNew
+	return zone
 }
 
 func NewErr(errCode int32) *msg.Error {

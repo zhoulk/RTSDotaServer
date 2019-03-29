@@ -51,6 +51,7 @@ func fightGuanKa(player *entry.Player, gk *entry.GuanKa) bool {
 		// 主动技能生效 or 普通攻击
 		for _, hero := range fightHeros {
 			isAttack := false
+			hero.CheckBuff(timer)
 			for _, skill := range hero.Skills {
 				if skill.Type == entry.SkillTypeActive && skill.IsOpen {
 					if skill.Attack(timer, hero, fightHeros) {
@@ -89,7 +90,7 @@ func fightGuanKa(player *entry.Player, gk *entry.GuanKa) bool {
 			res[hero.Group] = true
 		}
 		if len(res) <= 1 {
-			if res[selfHeros[0].Group] {
+			if res[1] {
 				isWin = true
 			}
 			break

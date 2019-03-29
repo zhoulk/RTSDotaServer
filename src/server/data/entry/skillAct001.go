@@ -57,6 +57,10 @@ func (a SkillAct001) Attack(timer int32, skill *Skill, from *Hero, heros []*Hero
 		break
 	}
 
+	if from.Blood < expendBlood {
+		return false
+	}
+
 	var targetHero *Hero
 	var attackHero *Hero
 	var selfMinBlood int32 = math.MaxInt32
