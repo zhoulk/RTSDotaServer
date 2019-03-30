@@ -104,6 +104,7 @@ func handleRandomHero(args []interface{}) {
 			data.Module.SavePlayerHero(player, hero)
 			player.BaseInfo.Gold -= 1000
 
+			response.Hero = ConverHeroToMsgHero(hero)
 			response.Code = msg.ResponseCode_SUCCESS
 		}
 		break
@@ -123,6 +124,7 @@ func handleRandomHero(args []interface{}) {
 			data.Module.SavePlayerHero(player, hero)
 			player.BaseInfo.Diamond -= 20
 
+			response.Hero = ConverHeroToMsgHero(hero)
 			response.Code = msg.ResponseCode_SUCCESS
 		}
 		break
@@ -142,6 +144,7 @@ func handleRandomHero(args []interface{}) {
 			data.Module.SavePlayerHero(player, hero)
 			player.BaseInfo.Diamond -= 200
 
+			response.Hero = ConverHeroToMsgHero(hero)
 			response.Code = msg.ResponseCode_SUCCESS
 		}
 		break
