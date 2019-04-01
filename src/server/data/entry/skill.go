@@ -10,14 +10,16 @@ const (
 )
 
 type Skill struct {
-	Id      int32
-	Name    string
-	Level   int32
-	Type    int32
-	Desc    string
-	IsOpen  bool
-	HeroId  string
-	SkillId string
+	Id        int32
+	Name      string
+	Level     int32
+	Type      int32
+	LevelDesc []string
+	Desc      string
+	CoolTime  []int32
+	IsOpen    bool
+	HeroId    string
+	SkillId   string
 
 	act SkillAct
 }

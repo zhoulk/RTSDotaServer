@@ -17,7 +17,7 @@ func InitHeros() []*entry.Hero {
 	for _, v := range m {
 		// log.Debug("%v = %v", k, v)
 
-		var hero entry.Hero
+		var hero *entry.Hero
 		bytes, err := json.Marshal(v)
 		if err != nil {
 			log.Debug("err was %v", err)
@@ -33,7 +33,7 @@ func InitHeros() []*entry.Hero {
 		hero.SkillPoint = 1
 		hero.MaxBlood = hero.Blood
 		hero.MaxMP = hero.MP
-		heros = append(heros, &hero)
+		heros = append(heros, hero)
 	}
 
 	log.Debug("%v", heros)

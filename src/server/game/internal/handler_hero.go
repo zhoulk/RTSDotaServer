@@ -286,5 +286,6 @@ func ConverHeroToMsgHero(v *entry.Hero) *msg.Hero {
 	hero.MaxMP = v.MaxMP
 	hero.MaxBlood = v.MaxBlood
 	hero.Exp = v.Exp
+	hero.SkillPoint = v.SkillPoint
 	return hero
 }

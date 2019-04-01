@@ -68,6 +68,7 @@ func handleSkillUpgrade(args []interface{}) {
 
 	response := new(msg.SkillUpgradeResponse)
 	response.Code = msg.ResponseCode_SUCCESS
+	response.Skill = ConverSkillToMsgSkill(skill)
 	a.WriteMsg(response)
 }
 
@@ -81,5 +82,6 @@ func ConverSkillToMsgSkill(v *entry.Skill) *msg.Skill {
 	skill.IsOpen = v.IsOpen
 	skill.SkillId = v.SkillId
 	skill.HeroId = v.HeroId
+	skill.LevelDesc = v.LevelDesc
 	return skill
 }

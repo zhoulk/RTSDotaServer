@@ -4,10 +4,19 @@ import (
 	"fmt"
 )
 
+const (
+	ChapterStatusLock    int32 = 1
+	ChapterStatusNormal  int32 = 2
+	ChapterStatusCleared int32 = 3
+)
+
 type Chapter struct {
-	Id     int32
-	Name   string
-	IsOpen bool
+	Id        int32
+	Name      string
+	Star      int32
+	Status    int32
+	GuanKaNum int32
+	IsOpen    bool
 }
 
 type GuanKa struct {
