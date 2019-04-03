@@ -64,3 +64,34 @@ func handleBattleGuanKa(args []interface{}) {
 
 	a.WriteMsg(response)
 }
+
+func handleBattleStart(args []interface{}) {
+	log.Debug("game handleBattleStart")
+
+	// m := args[0].(*msg.BattleStartRequest)
+	a := args[1].(gate.Agent)
+
+	// battleId := m.GetBattleId()
+	// player := a.UserData().(*entry.Player)
+
+	response := new(msg.BattleStartResponse)
+	response.Code = msg.ResponseCode_SUCCESS
+
+	response.Heros = make([]*msg.Hero, 0)
+	response.Skills = make([]*msg.Skill, 0)
+	response.Items = make([]*msg.Item, 0)
+	selectHeros := data.Module.AllHeros()
+	// selectSkills := data.Module.AllSkills()
+	// selectItems := data.Module.AllItems()
+	for _, hero := range selectHeros {
+		response.Heros = append(response.Heros, ConverHeroToMsgHero(hero))
+	}
+	// for _, skill := range selectSkills {
+	// 	response.Skills = append(response.Skills, ConverSkillToMsgSkill(skill))
+	// }
+	// for _, item := range selectItems {
+	// 	response.Items = append(response.Items, ConverItemToMsgItem(item))
+	// }
+
+	a.WriteMsg(response)
+}

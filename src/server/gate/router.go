@@ -24,4 +24,5 @@ func init() {
 	msg.Processor.SetRouter(&msg.SkillUpgradeRequest{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.HeroSkillsRequest{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.HeroItemsRequest{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.BattleStartRequest{}, game.ChanRPC)
 }

@@ -21,6 +21,7 @@ func init() {
 	handler(&msg.SkillUpgradeRequest{}, handleSkillUpgrade)
 	handler(&msg.HeroSkillsRequest{}, handleHeroSkills)
 	handler(&msg.HeroItemsRequest{}, handleHeroItems)
+	handler(&msg.BattleStartRequest{}, handleBattleStart)
 }
 
 func handler(m interface{}, h interface{}) {
