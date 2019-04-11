@@ -27,6 +27,8 @@ type BaseInfo struct {
 type ExtendInfo struct {
 	SelectHeroIds []string
 	SelectHeros   []*Hero
+
+	GroupId string
 }
 
 func NewBaseInfo() *BaseInfo {

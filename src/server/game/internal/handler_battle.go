@@ -10,6 +10,46 @@ import (
 	"github.com/name5566/leaf/log"
 )
 
+func handleBattleResult(args []interface{}) {
+	log.Debug("game handleBattleResult")
+
+	m := args[0].(*msg.BattleResultRequest)
+	a := args[1].(gate.Agent)
+
+	// battleId := m.GetBattleId()
+	result := m.GetResult()
+	player := a.UserData().(*entry.Player)
+
+	log.Debug("result ", result)
+
+	earn := new(entry.Earn)
+	switch result {
+	case entry.BattleResultStar1:
+		earn.Gold = 100
+		earn.HeroExp = 120
+		earn.PlayerExp = 100
+		earn.ItemIds = make([]int32, 0)
+		earn.ItemIds = append(earn.ItemIds, 1)
+		earn.ItemIds = append(earn.ItemIds, 2)
+		break
+	case entry.BattleResultStar2:
+	case entry.BattleResultStar3:
+		break
+	case entry.BattleResultStar0:
+		earn.Gold = 0
+		earn.HeroExp = 0
+		earn.PlayerExp = 100
+		break
+	}
+
+	data.Module.EffectByEarn(player, earn)
+
+	response := new(msg.BattleResultResponse)
+	response.Code = msg.ResponseCode_SUCCESS
+	response.Earn = ConverEarnToMsgEarn(earn)
+	a.WriteMsg(response)
+}
+
 func handleBattleGuanKa(args []interface{}) {
 	log.Debug("game handleBattleGuanKa")
 

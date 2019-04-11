@@ -10,6 +10,13 @@ const (
 	ChapterStatusCleared int32 = 3
 )
 
+const (
+	BattleResultStar1 int32 = 1
+	BattleResultStar2 int32 = 2
+	BattleResultStar3 int32 = 3
+	BattleResultStar0 int32 = 4
+)
+
 type Chapter struct {
 	Id        int32
 	Name      string

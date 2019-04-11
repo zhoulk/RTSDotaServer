@@ -24,6 +24,7 @@ type Module struct {
 	playerChapters map[string][]*entry.Chapter
 	guanKas        []*entry.GuanKa
 	playerGuanKas  map[string][]*entry.GuanKa
+	groups         []*entry.Group
 }
 
 func (m *Module) OnInit() {

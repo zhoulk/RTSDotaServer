@@ -25,4 +25,11 @@ func init() {
 	msg.Processor.SetRouter(&msg.HeroSkillsRequest{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.HeroItemsRequest{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.BattleStartRequest{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.BattleResultRequest{}, game.ChanRPC)
+
+	msg.Processor.SetRouter(&msg.GroupOwnRequest{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.GroupListRequest{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.GroupCreateRequest{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.GroupMembersRequest{}, game.ChanRPC)
+
 }

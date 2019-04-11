@@ -22,6 +22,12 @@ func init() {
 	handler(&msg.HeroSkillsRequest{}, handleHeroSkills)
 	handler(&msg.HeroItemsRequest{}, handleHeroItems)
 	handler(&msg.BattleStartRequest{}, handleBattleStart)
+	handler(&msg.BattleResultRequest{}, handleBattleResult)
+
+	handler(&msg.GroupOwnRequest{}, handleGroupOwn)
+	handler(&msg.GroupListRequest{}, handleGroupList)
+	handler(&msg.GroupCreateRequest{}, handleGroupCreate)
+	handler(&msg.GroupMembersRequest{}, handleGroupMembers)
 }
 
 func handler(m interface{}, h interface{}) {
