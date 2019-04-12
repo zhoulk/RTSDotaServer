@@ -17,6 +17,9 @@ const (
 
 	SkillUpgradeExistErr int32 = 300
 	SkillUpgradeSPErr    int32 = 301
+
+	GroupCreateDiamondErr int32 = 400
+	GroupCreateExistErr   int32 = 401
 )
 
 var ERRMAP map[int32]string = map[int32]string{
@@ -36,6 +39,9 @@ var ERRMAP map[int32]string = map[int32]string{
 
 	SkillUpgradeExistErr: "技能不存在",
 	SkillUpgradeSPErr:    "技能点不足",
+
+	GroupCreateDiamondErr: "钻石不足",
+	GroupCreateExistErr:   "已经拥有一个军团",
 }
 
 const (

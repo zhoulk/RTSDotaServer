@@ -7,6 +7,9 @@ type Group struct {
 	GroupDeclaration string
 	MemberCnt        int32
 	MemberTotal      int32
+	GroupLevel       int32
+	ContriCurrent    int32
+	ContriLevelUp    int32
 }
 
 type GroupMember struct {

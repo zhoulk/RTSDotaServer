@@ -3,6 +3,7 @@ package internal
 import (
 	"server/data"
 	"server/data/entry"
+	"server/define"
 	"server/msg"
 
 	"github.com/name5566/leaf/gate"
@@ -26,6 +27,8 @@ func handleGroupOwn(args []interface{}) {
 		response.Group = ConverGroupToMsgGroup(ownGroup)
 	}
 
+	log.Debug("%v", response.Group)
+
 	a.WriteMsg(response)
 }
 
@@ -35,6 +38,32 @@ func handleGroupList(args []interface{}) {
 
 func handleGroupCreate(args []interface{}) {
 	log.Debug("game handleGroupCreate")
+
+	m := args[0].(*msg.GroupCreateRequest)
+	a := args[1].(gate.Agent)
+
+	// // 输出收到的消息的内容
+	log.Debug("user %v", a.UserData())
+	groupName := m.GetGroupName()
+	player := a.UserData().(*entry.Player)
+
+	if player.BaseInfo.Diamond < 500 {
+		response := new(msg.GroupCreateResponse)
+		response.Code = msg.ResponseCode_FAIL
+		response.Err = NewErr(define.GroupCreateDiamondErr)
+		a.WriteMsg(response)
+		return
+	}
+
+	response := new(msg.GroupCreateResponse)
+	response.Code = msg.ResponseCode_SUCCESS
+
+	ownGroup := data.Module.CreateGroup(player, groupName)
+	if ownGroup != nil {
+		response.Group = ConverGroupToMsgGroup(ownGroup)
+	}
+
+	a.WriteMsg(response)
 }
 
 func handleGroupMembers(args []interface{}) {
@@ -49,5 +78,8 @@ func ConverGroupToMsgGroup(v *entry.Group) *msg.Group {
 	group.GroupLeader = v.GroupLeader
 	group.MemberCnt = v.MemberCnt
 	group.MemberTotal = v.MemberTotal
+	group.GroupLevel = v.GroupLevel
+	group.ContriCurrent = v.ContriCurrent
+	group.ContriLevelUp = v.ContriLevelUp
 	return group
 }
