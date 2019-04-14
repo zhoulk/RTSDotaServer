@@ -10,6 +10,8 @@ type Group struct {
 	GroupLevel       int32
 	ContriCurrent    int32
 	ContriLevelUp    int32
+
+	GroupMembers []*GroupMember
 }
 
 type GroupMember struct {

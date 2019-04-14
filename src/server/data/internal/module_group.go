@@ -39,6 +39,13 @@ func (m *Module) CreateGroup(player *entry.Player, name string) *entry.Group {
 	group.GroupLevel = 1
 	group.ContriCurrent = 0
 	group.ContriLevelUp = 5000
+	group.GroupMembers = make([]*entry.GroupMember, 0)
+
+	member := new(entry.GroupMember)
+	member.UserId = player.UserId
+	member.Level = player.BaseInfo.Level
+	member.Name = player.Name
+	group.GroupMembers = append(group.GroupMembers, member)
 
 	if player.ExtendInfo == nil {
 		player.ExtendInfo = new(entry.ExtendInfo)
@@ -48,4 +55,13 @@ func (m *Module) CreateGroup(player *entry.Player, name string) *entry.Group {
 	m.groups = append(m.groups, group)
 
 	return group
+}
+
+func (m *Module) GroupMembers(groupId string) []*entry.GroupMember {
+	for _, group := range m.groups {
+		if group.GroupId == groupId {
+			return group.GroupMembers
+		}
+	}
+	return nil
 }
