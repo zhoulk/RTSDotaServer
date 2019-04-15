@@ -85,7 +85,7 @@ func handleGroupMembers(args []interface{}) {
 		return
 	}
 
-	response := new(msg.GroupMemberResponse)
+	response := new(msg.GroupMembersResponse)
 	response.Code = msg.ResponseCode_SUCCESS
 
 	members := data.Module.GroupMembers(groupID)

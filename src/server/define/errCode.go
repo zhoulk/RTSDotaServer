@@ -1,8 +1,10 @@
 package define
 
 const (
-	LoginRegisteExistErr  int32 = 1
-	LoginLoginNotExistErr int32 = 2
+	SysRequestArgsErr int32 = 1
+
+	LoginRegisteExistErr  int32 = 501
+	LoginLoginNotExistErr int32 = 502
 
 	HeroRandomLevelErr   int32 = 100
 	HeroRandomGoldErr    int32 = 101
@@ -23,6 +25,8 @@ const (
 )
 
 var ERRMAP map[int32]string = map[int32]string{
+	SysRequestArgsErr: "请求参数异常",
+
 	LoginRegisteExistErr:  "用户已存在",
 	LoginLoginNotExistErr: "用户不存在",
 

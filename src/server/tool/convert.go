@@ -1,5 +1,7 @@
 package tool
 
+import "regexp"
+
 func String(n int32) string {
 	buf := [11]byte{}
 	pos := len(buf)
@@ -19,4 +21,10 @@ func String(n int32) string {
 			return string(buf[pos:])
 		}
 	}
+}
+
+func IsNum(str string) bool {
+	pattern := "\\d+" //反斜杠要转义
+	result, _ := regexp.MatchString(pattern, str)
+	return result
 }

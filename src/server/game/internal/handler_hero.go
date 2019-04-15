@@ -12,6 +12,34 @@ import (
 	"github.com/name5566/leaf/log"
 )
 
+func handleHeroLottery(args []interface{}) {
+	log.Debug("game handleHeroLottery")
+	a := args[1].(gate.Agent)
+
+	// // 输出收到的消息的内容
+	log.Debug("user %v", a.UserData())
+	player := a.UserData().(*entry.Player)
+
+	response := new(msg.HeroLotteryResponse)
+	response.Code = msg.ResponseCode_SUCCESS
+
+	heroLottery := new(msg.HeroLottery)
+	heroLottery.FreeGoodLottery = player.ExtendInfo.FreeGoodLottery
+	heroLottery.FreeBetterLottery = player.ExtendInfo.FreeBetterLottery
+	heroLottery.MaxFreeGoodLottery = player.ExtendInfo.MaxFreeGoodLottery
+	heroLottery.MaxFreeBetterLottery = player.ExtendInfo.MaxFreeBetterLottery
+	heroLottery.NextGoodLotteryStamp = player.ExtendInfo.LastFreeGoodLotteryStamp + 5*tool.SecondsPerMinute
+	heroLottery.NextBetterLotteryStamp = player.ExtendInfo.LastFreeBetterLotteryStamp + tool.SecondsPerDay
+	heroLottery.GoodLotteryCnt = player.ExtendInfo.GoodLotteryCnt
+	heroLottery.BetterLotteryCnt = player.ExtendInfo.BetterLotteryCnt
+	heroLottery.NeedGoodLotteryCnt = player.ExtendInfo.NeedGoodLotteryCnt
+	heroLottery.NeedBetterLotteryCnt = player.ExtendInfo.NeedBetterLotteryCnt
+
+	response.HeroLottery = heroLottery
+
+	a.WriteMsg(response)
+}
+
 func handleOwnHero(args []interface{}) {
 	log.Debug("game handleOwnHero")
 	//m := args[0].(*msg.HeroRequest)
@@ -89,7 +117,7 @@ func handleRandomHero(args []interface{}) {
 	heros := data.Module.AllHeros()
 	switch level {
 	case msg.HeroRandomLevel_GOOD:
-		if player.BaseInfo.Gold < 1000 {
+		if player.ExtendInfo.MaxFreeGoodLottery == 0 && player.BaseInfo.Gold < 1000 {
 			response.Code = msg.ResponseCode_FAIL
 			err := new(msg.Error)
 			err.Code = define.HeroRandomGoldErr
@@ -102,14 +130,19 @@ func handleRandomHero(args []interface{}) {
 			hero.HeroId = tool.UniqueId()
 			hero.PlayerId = player.UserId
 			data.Module.SavePlayerHero(player, hero)
-			player.BaseInfo.Gold -= 1000
+
+			if player.ExtendInfo.MaxFreeGoodLottery > 0 {
+				player.ExtendInfo.MaxFreeGoodLottery--
+			} else {
+				player.BaseInfo.Gold -= 1000
+			}
 
 			response.Hero = ConverHeroToMsgHero(hero)
 			response.Code = msg.ResponseCode_SUCCESS
 		}
 		break
 	case msg.HeroRandomLevel_BETTER:
-		if player.BaseInfo.Diamond < 20 {
+		if player.ExtendInfo.MaxFreeBetterLottery == 0 && player.BaseInfo.Diamond < 200 {
 			response.Code = msg.ResponseCode_FAIL
 			err := new(msg.Error)
 			err.Code = define.HeroRandomDiamondErr
@@ -122,7 +155,12 @@ func handleRandomHero(args []interface{}) {
 			hero.HeroId = tool.UniqueId()
 			hero.PlayerId = player.UserId
 			data.Module.SavePlayerHero(player, hero)
-			player.BaseInfo.Diamond -= 20
+
+			if player.ExtendInfo.MaxFreeBetterLottery > 0 {
+				player.ExtendInfo.MaxFreeBetterLottery--
+			} else {
+				player.BaseInfo.Diamond -= 200
+			}
 
 			response.Hero = ConverHeroToMsgHero(hero)
 			response.Code = msg.ResponseCode_SUCCESS

@@ -5,10 +5,79 @@ import (
 	"server/data/entry"
 	"server/define"
 	"server/msg"
+	"server/tool"
+	"strconv"
 
 	"github.com/name5566/leaf/gate"
 	"github.com/name5566/leaf/log"
 )
+
+const (
+	BattleTypeGuanKa int32 = 1
+)
+
+func handleBattleCreate(args []interface{}) {
+	log.Debug("game handleBattleResult")
+
+	m := args[0].(*msg.BattleCreateRequest)
+	a := args[1].(gate.Agent)
+
+	// battleId := m.GetBattleId()
+	createType := m.GetType()
+	createArgs := m.GetArgs()
+	player := a.UserData().(*entry.Player)
+
+	switch createType {
+	case BattleTypeGuanKa:
+		if createArgs == nil || len(createArgs) < 1 {
+			response := new(msg.BattleCreateResponse)
+			response.Code = msg.ResponseCode_FAIL
+			response.Err = NewErr(define.SysRequestArgsErr)
+			a.WriteMsg(response)
+			return
+		} else {
+			gkId := createArgs[0]
+			gkIdNum, err := strconv.ParseInt(gkId, 0, 32)
+			if err != nil {
+				response := new(msg.BattleCreateResponse)
+				response.Code = msg.ResponseCode_FAIL
+				response.Err = NewErr(define.SysRequestArgsErr)
+				a.WriteMsg(response)
+				return
+			}
+			guanKa := data.Module.FindGuanKa(player, int32(gkIdNum))
+			if !guanKa.IsOpen {
+				response := new(msg.BattleCreateResponse)
+				response.Code = msg.ResponseCode_FAIL
+				response.Err = NewErr(define.BattleGuanKaOpenErr)
+				a.WriteMsg(response)
+				return
+			}
+			// 判断体力是否充足
+			if player.BaseInfo.Power < 6 {
+				response := new(msg.BattleCreateResponse)
+				response.Code = msg.ResponseCode_FAIL
+				response.Err = NewErr(define.BattlePlayerPowerErr)
+				a.WriteMsg(response)
+				return
+			}
+			selectHeros := data.Module.SelectHeros(player)
+			if selectHeros == nil || len(selectHeros) == 0 {
+				response := new(msg.BattleCreateResponse)
+				response.Code = msg.ResponseCode_FAIL
+				response.Err = NewErr(define.BattleNoneHeroErr)
+				a.WriteMsg(response)
+				return
+			}
+		}
+		break
+	}
+
+	response := new(msg.BattleCreateResponse)
+	response.Code = msg.ResponseCode_SUCCESS
+	response.BattleId = tool.UniqueId()
+	a.WriteMsg(response)
+}
 
 func handleBattleResult(args []interface{}) {
 	log.Debug("game handleBattleResult")

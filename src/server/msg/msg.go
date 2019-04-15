@@ -52,5 +52,9 @@ func init() {
 	Processor.Register(140, &GroupCreateRequest{})
 	Processor.Register(141, &GroupCreateResponse{})
 	Processor.Register(142, &GroupMembersRequest{})
-	Processor.Register(143, &GroupMemberResponse{})
+	Processor.Register(143, &GroupMembersResponse{})
+	Processor.Register(144, &BattleCreateRequest{})
+	Processor.Register(145, &BattleCreateResponse{})
+	Processor.Register(146, &HeroLotteryRequest{})
+	Processor.Register(147, &HeroLotteryResponse{})
 }

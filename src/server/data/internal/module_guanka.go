@@ -65,7 +65,7 @@ func (m *Module) FindGuanKaDefine(guanKaID int32) *entry.GuanKa {
 }
 
 // FindGuanKa ...
-func (m *Module) FindGuanKa(player *entry.Player, guanKaID int32) *entry.GuanKa {
+func (m *Module)  FindGuanKa(player *entry.Player, guanKaID int32) *entry.GuanKa {
 	guanKas := m.AllGuanKas(player)
 	if guanKas != nil {
 		for _, guanKa := range guanKas {

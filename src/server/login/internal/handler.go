@@ -46,8 +46,8 @@ func handleRegiste(args []interface{}) {
 	player.Password = m.GetPassword()
 	player.Name = m.GetAccount()
 
-	baseInfo := entry.NewBaseInfo()
-	player.BaseInfo = baseInfo
+	player.BaseInfo = entry.NewBaseInfo()
+	player.ExtendInfo = entry.NewExtendInfo()
 
 	data.Module.SavePlayer(player)
 

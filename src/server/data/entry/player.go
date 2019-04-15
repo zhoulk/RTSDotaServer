@@ -2,6 +2,7 @@ package entry
 
 import (
 	"server/define"
+	"time"
 )
 
 type Player struct {
@@ -29,18 +30,44 @@ type ExtendInfo struct {
 	SelectHeros   []*Hero
 
 	GroupId string
+
+	FreeGoodLottery            int32
+	FreeBetterLottery          int32
+	MaxFreeGoodLottery         int32
+	MaxFreeBetterLottery       int32
+	LastFreeGoodLotteryStamp   int64
+	LastFreeBetterLotteryStamp int64
+	GoodLotteryCnt             int32
+	BetterLotteryCnt           int32
+	NeedGoodLotteryCnt         int32
+	NeedBetterLotteryCnt       int32
 }
 
 func NewBaseInfo() *BaseInfo {
 	baseInfo := new(BaseInfo)
-	baseInfo.Gold = 10000
-	baseInfo.Diamond = 1000
+	baseInfo.Gold = 0
+	baseInfo.Diamond = 0
 	baseInfo.Level = 1
 	baseInfo.Power = define.PLAYER_MAX_MP
 	baseInfo.MaxPower = define.PLAYER_MAX_MP
 	baseInfo.Exp = 0
 	baseInfo.LevelUpExp = 90
 	return baseInfo
+}
+
+func NewExtendInfo() *ExtendInfo {
+	extendInfo := new(ExtendInfo)
+	extendInfo.MaxFreeGoodLottery = 5
+	extendInfo.MaxFreeBetterLottery = 1
+	extendInfo.FreeGoodLottery = extendInfo.MaxFreeGoodLottery
+	extendInfo.FreeBetterLottery = extendInfo.MaxFreeBetterLottery
+	extendInfo.LastFreeGoodLotteryStamp = time.Now().Unix()
+	extendInfo.LastFreeBetterLotteryStamp = time.Now().Unix()
+	extendInfo.GoodLotteryCnt = 0
+	extendInfo.BetterLotteryCnt = 0
+	extendInfo.NeedGoodLotteryCnt = 10
+	extendInfo.NeedBetterLotteryCnt = 10
+	return extendInfo
 }
 
 func (p *Player) EffectByEarn(earn *Earn) {

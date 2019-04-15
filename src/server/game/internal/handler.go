@@ -10,19 +10,25 @@ func init() {
 	handler(&msg.HeroRequest{}, handleAllHero)
 	handler(&msg.HeroRandomRequest{}, handleRandomHero)
 	handler(&msg.HeroOwnRequest{}, handleOwnHero)
-
-	handler(&msg.SkillRequest{}, handleAllSkill)
-	handler(&msg.ItemRequest{}, handleAllItem)
-	handler(&msg.ChapterRequest{}, handleAllChapter)
-	handler(&msg.GuanKaRequest{}, handleAllGuanKa)
-	handler(&msg.BattleGuanKaRequest{}, handleBattleGuanKa)
 	handler(&msg.HeroSelectRequest{}, handleHeroSelect)
 	handler(&msg.HeroUnSelectRequest{}, handleHeroUnSelect)
-	handler(&msg.SkillUpgradeRequest{}, handleSkillUpgrade)
-	handler(&msg.HeroSkillsRequest{}, handleHeroSkills)
 	handler(&msg.HeroItemsRequest{}, handleHeroItems)
+	handler(&msg.HeroSkillsRequest{}, handleHeroSkills)
+	handler(&msg.HeroLotteryRequest{}, handleHeroLottery)
+
+	handler(&msg.SkillRequest{}, handleAllSkill)
+	handler(&msg.SkillUpgradeRequest{}, handleSkillUpgrade)
+
+	handler(&msg.ItemRequest{}, handleAllItem)
+
+	handler(&msg.ChapterRequest{}, handleAllChapter)
+	handler(&msg.GuanKaRequest{}, handleAllGuanKa)
+
+	handler(&msg.BattleGuanKaRequest{}, handleBattleGuanKa)
+
 	handler(&msg.BattleStartRequest{}, handleBattleStart)
 	handler(&msg.BattleResultRequest{}, handleBattleResult)
+	handler(&msg.BattleCreateRequest{}, handleBattleCreate)
 
 	handler(&msg.GroupOwnRequest{}, handleGroupOwn)
 	handler(&msg.GroupListRequest{}, handleGroupList)
