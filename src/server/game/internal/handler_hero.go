@@ -7,6 +7,7 @@ import (
 	"server/define"
 	"server/msg"
 	"server/tool"
+	"time"
 
 	"github.com/name5566/leaf/gate"
 	"github.com/name5566/leaf/log"
@@ -117,7 +118,7 @@ func handleRandomHero(args []interface{}) {
 	heros := data.Module.AllHeros()
 	switch level {
 	case msg.HeroRandomLevel_GOOD:
-		if player.ExtendInfo.MaxFreeGoodLottery == 0 && player.BaseInfo.Gold < 1000 {
+		if (player.ExtendInfo.FreeGoodLottery == 0 || player.ExtendInfo.LastFreeGoodLotteryStamp+5*tool.SecondsPerMinute > time.Now().Unix()) && player.BaseInfo.Gold < 1000 {
 			response.Code = msg.ResponseCode_FAIL
 			err := new(msg.Error)
 			err.Code = define.HeroRandomGoldErr
@@ -131,18 +132,21 @@ func handleRandomHero(args []interface{}) {
 			hero.PlayerId = player.UserId
 			data.Module.SavePlayerHero(player, hero)
 
-			if player.ExtendInfo.MaxFreeGoodLottery > 0 {
-				player.ExtendInfo.MaxFreeGoodLottery--
+			if player.ExtendInfo.FreeGoodLottery > 0 {
+				player.ExtendInfo.FreeGoodLottery--
+				player.ExtendInfo.LastFreeGoodLotteryStamp = time.Now().Unix()
 			} else {
 				player.BaseInfo.Gold -= 1000
 			}
+
+			player.ExtendInfo.GoodLotteryCnt++
 
 			response.Hero = ConverHeroToMsgHero(hero)
 			response.Code = msg.ResponseCode_SUCCESS
 		}
 		break
 	case msg.HeroRandomLevel_BETTER:
-		if player.ExtendInfo.MaxFreeBetterLottery == 0 && player.BaseInfo.Diamond < 200 {
+		if (player.ExtendInfo.FreeBetterLottery == 0 || player.ExtendInfo.LastFreeBetterLotteryStamp+tool.SecondsPerDay > time.Now().Unix()) && player.BaseInfo.Diamond < 200 {
 			response.Code = msg.ResponseCode_FAIL
 			err := new(msg.Error)
 			err.Code = define.HeroRandomDiamondErr
@@ -156,11 +160,14 @@ func handleRandomHero(args []interface{}) {
 			hero.PlayerId = player.UserId
 			data.Module.SavePlayerHero(player, hero)
 
-			if player.ExtendInfo.MaxFreeBetterLottery > 0 {
-				player.ExtendInfo.MaxFreeBetterLottery--
+			if player.ExtendInfo.FreeBetterLottery > 0 {
+				player.ExtendInfo.FreeBetterLottery--
+				player.ExtendInfo.LastFreeBetterLotteryStamp = time.Now().Unix()
 			} else {
 				player.BaseInfo.Diamond -= 200
 			}
+
+			player.ExtendInfo.BetterLotteryCnt++
 
 			response.Hero = ConverHeroToMsgHero(hero)
 			response.Code = msg.ResponseCode_SUCCESS

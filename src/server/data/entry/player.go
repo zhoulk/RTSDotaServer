@@ -45,7 +45,7 @@ type ExtendInfo struct {
 
 func NewBaseInfo() *BaseInfo {
 	baseInfo := new(BaseInfo)
-	baseInfo.Gold = 0
+	baseInfo.Gold = 10000
 	baseInfo.Diamond = 0
 	baseInfo.Level = 1
 	baseInfo.Power = define.PLAYER_MAX_MP
