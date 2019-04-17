@@ -27,13 +27,17 @@ type Chapter struct {
 }
 
 type GuanKa struct {
-	Id        int32
-	Name      string
-	ChapterId int32
-	Heros     []*Hero
-	Earn      *Earn
-	Expend    *Expend
-	IsOpen    bool
+	Id         int32
+	Name       string
+	ChapterId  int32
+	Heros      []*Hero
+	Earn       *Earn
+	Expend     *Expend
+	IsOpen     bool
+	Star       int32
+	Status     int32
+	Times      int32
+	TotalTimes int32
 }
 
 type Earn struct {

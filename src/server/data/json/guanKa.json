@@ -1,7 +1,7 @@
 [
     {
         "Id" : 1,
-        "Name" : "钢背兽",
+        "Name" : "死亡缠绕",
         "ChapterId" : 1,
         "Earn" : {
             "ItemIds" : [1, 2],
@@ -50,8 +50,120 @@
     },
     {
         "Id" : 2,
-        "Name"  : "剑圣",
+        "Name"  : "无光之盾",
         "ChapterId" : 1,
+        "Earn" : {
+            "ItemIds" : [2, 3],
+            "HeroExp" : 20,
+            "PlayerExp" : 12,
+            "Gold" : 110
+        },
+        "Expend" : {
+            "Power" : 6
+        }
+    },
+    {
+        "Id" : 3,
+        "Name"  : "霜之哀伤",
+        "ChapterId" : 1,
+        "Earn" : {
+            "ItemIds" : [2, 3],
+            "HeroExp" : 20,
+            "PlayerExp" : 12,
+            "Gold" : 110
+        },
+        "Expend" : {
+            "Power" : 6
+        }
+    },
+    {
+        "Id" : 4,
+        "Name"  : "回光返照",
+        "ChapterId" : 1,
+        "Earn" : {
+            "ItemIds" : [2, 3],
+            "HeroExp" : 20,
+            "PlayerExp" : 12,
+            "Gold" : 110
+        },
+        "Expend" : {
+            "Power" : 6
+        }
+    },
+    {
+        "Id" : 5,
+        "Name"  : "地狱领主",
+        "ChapterId" : 1,
+        "Earn" : {
+            "ItemIds" : [2, 3],
+            "HeroExp" : 20,
+            "PlayerExp" : 12,
+            "Gold" : 110
+        },
+        "Expend" : {
+            "Power" : 6
+        }
+    },
+    {
+        "Id" : 6,
+        "Name"  : "魔法箭",
+        "ChapterId" : 2,
+        "Earn" : {
+            "ItemIds" : [2, 3],
+            "HeroExp" : 20,
+            "PlayerExp" : 12,
+            "Gold" : 110
+        },
+        "Expend" : {
+            "Power" : 6
+        }
+    },
+    {
+        "Id" : 7,
+        "Name"  : "恐怖波动",
+        "ChapterId" : 2,
+        "Earn" : {
+            "ItemIds" : [2, 3],
+            "HeroExp" : 20,
+            "PlayerExp" : 12,
+            "Gold" : 110
+        },
+        "Expend" : {
+            "Power" : 6
+        }
+    },
+    {
+        "Id" : 8,
+        "Name"  : "复仇光环",
+        "ChapterId" : 2,
+        "Earn" : {
+            "ItemIds" : [2, 3],
+            "HeroExp" : 20,
+            "PlayerExp" : 12,
+            "Gold" : 110
+        },
+        "Expend" : {
+            "Power" : 6
+        }
+    },
+    {
+        "Id" : 9,
+        "Name"  : "移形换位",
+        "ChapterId" : 2,
+        "Earn" : {
+            "ItemIds" : [2, 3],
+            "HeroExp" : 20,
+            "PlayerExp" : 12,
+            "Gold" : 110
+        },
+        "Expend" : {
+            "Power" : 6
+        }
+    },
+    {
+        "Id" : 10,
+        "Name"  : "复仇之魂",
+        "ChapterId" : 2,
         "Earn" : {
             "ItemIds" : [2, 3],
             "HeroExp" : 20,

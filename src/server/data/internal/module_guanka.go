@@ -33,11 +33,15 @@ func (m *Module) AllGuanKas(player *entry.Player) []*entry.GuanKa {
 	}
 	if m.playerGuanKas[player.UserId] == nil {
 		guanKas := make([]*entry.GuanKa, 0)
-		gk := m.FindGuanKaDefine(1)
-		guanKa := new(entry.GuanKa)
-		tool.DeepCopy(guanKa, gk)
-		guanKa.IsOpen = true
-		guanKas = append(guanKas, guanKa)
+
+		for i, gk := range m.guanKas {
+			guanKa := new(entry.GuanKa)
+			tool.DeepCopy(guanKa, gk)
+			if i == 0 {
+				guanKa.IsOpen = true
+			}
+			guanKas = append(guanKas, guanKa)
+		}
 		m.playerGuanKas[player.UserId] = guanKas
 	}
 
@@ -65,7 +69,7 @@ func (m *Module) FindGuanKaDefine(guanKaID int32) *entry.GuanKa {
 }
 
 // FindGuanKa ...
-func (m *Module)  FindGuanKa(player *entry.Player, guanKaID int32) *entry.GuanKa {
+func (m *Module) FindGuanKa(player *entry.Player, guanKaID int32) *entry.GuanKa {
 	guanKas := m.AllGuanKas(player)
 	if guanKas != nil {
 		for _, guanKa := range guanKas {
