@@ -8,7 +8,6 @@ import (
 	"server/game"
 	"server/gate"
 	"server/login"
-	"server/tool"
 
 	"github.com/name5566/leaf"
 	"github.com/name5566/leaf/log"
@@ -50,8 +49,8 @@ func main() {
 	// 	game.Module,
 	// )
 
-	arr := tool.C_M_N(10, 2)
-	log.Debug("%v", arr)
+	// arr := tool.C_M_N(8, 3)
+	// log.Debug("%v", arr)
 
 	leaf.Run(
 		gate.Module,

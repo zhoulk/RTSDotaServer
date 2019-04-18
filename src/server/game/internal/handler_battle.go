@@ -125,10 +125,14 @@ func handleGuanKaBattle(result int32, gk *entry.GuanKa) *entry.Earn {
 		earn.PlayerExp = gk.Earn.PlayerExp
 		earn.ItemIds = make([]int32, 0)
 
-		// itemCnt = len(gk.Earn.ItemIds)
+		itemCnt := len(gk.Earn.ItemIds)
 
-		earn.ItemIds = append(earn.ItemIds, 1)
-		earn.ItemIds = append(earn.ItemIds, 2)
+		indexArr := tool.C_M_N(int32(itemCnt), 1)
+
+		for _, index := range indexArr {
+			earn.ItemIds = append(earn.ItemIds, gk.Earn.ItemIds[index])
+		}
+
 		break
 	case entry.BattleResultStar0:
 		earn.Gold = 0

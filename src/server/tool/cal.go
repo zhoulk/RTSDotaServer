@@ -12,7 +12,7 @@ func C_M_N(m int32, n int32) []int32 {
 		origin = append(origin, i)
 	}
 
-	for j = 0; i < n; j++ {
+	for j = 0; j < n; j++ {
 		index := C_M_1(int32(len(origin)))
 		res = append(res, origin[index])
 		if index == int32(len(origin))-1 {
