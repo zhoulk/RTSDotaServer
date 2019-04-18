@@ -12,23 +12,18 @@ import (
 	"github.com/name5566/leaf/log"
 )
 
-const (
-	BattleTypeGuanKa int32 = 1
-)
-
 func handleBattleCreate(args []interface{}) {
 	log.Debug("game handleBattleResult")
 
 	m := args[0].(*msg.BattleCreateRequest)
 	a := args[1].(gate.Agent)
 
-	// battleId := m.GetBattleId()
 	createType := m.GetType()
 	createArgs := m.GetArgs()
 	player := a.UserData().(*entry.Player)
 
 	switch createType {
-	case BattleTypeGuanKa:
+	case entry.BattleTypeGuanKa:
 		if createArgs == nil || len(createArgs) < 1 {
 			response := new(msg.BattleCreateResponse)
 			response.Code = msg.ResponseCode_FAIL
@@ -45,6 +40,7 @@ func handleBattleCreate(args []interface{}) {
 				a.WriteMsg(response)
 				return
 			}
+			// 是否开启
 			guanKa := data.Module.FindGuanKa(player, int32(gkIdNum))
 			if !guanKa.IsOpen {
 				response := new(msg.BattleCreateResponse)
@@ -61,6 +57,7 @@ func handleBattleCreate(args []interface{}) {
 				a.WriteMsg(response)
 				return
 			}
+			// 是否上阵
 			selectHeros := data.Module.SelectHeros(player)
 			if selectHeros == nil || len(selectHeros) == 0 {
 				response := new(msg.BattleCreateResponse)
@@ -69,14 +66,18 @@ func handleBattleCreate(args []interface{}) {
 				a.WriteMsg(response)
 				return
 			}
+
+			battleId := tool.UniqueId()
+			data.Module.AddGuanKaBattle(battleId, guanKa)
+
+			response := new(msg.BattleCreateResponse)
+			response.Code = msg.ResponseCode_SUCCESS
+			response.BattleId = battleId
+			a.WriteMsg(response)
+			return
 		}
 		break
 	}
-
-	response := new(msg.BattleCreateResponse)
-	response.Code = msg.ResponseCode_SUCCESS
-	response.BattleId = tool.UniqueId()
-	a.WriteMsg(response)
 }
 
 func handleBattleResult(args []interface{}) {
@@ -85,38 +86,58 @@ func handleBattleResult(args []interface{}) {
 	m := args[0].(*msg.BattleResultRequest)
 	a := args[1].(gate.Agent)
 
-	// battleId := m.GetBattleId()
+	battleId := m.GetBattleId()
 	result := m.GetResult()
 	player := a.UserData().(*entry.Player)
 
 	log.Debug("result ", result)
 
+	battleInfo := data.Module.FindBattle(battleId)
+	if battleInfo == nil {
+		response := new(msg.BattleResultResponse)
+		response.Code = msg.ResponseCode_FAIL
+		response.Err = NewErr(define.BattleResultExistErr)
+		a.WriteMsg(response)
+		return
+	}
+
+	if battleInfo.Type == entry.BattleTypeGuanKa {
+		earn := handleGuanKaBattle(result, battleInfo.Guanka)
+
+		data.Module.EffectByEarn(player, earn)
+		data.Module.EffectByExpend(player, battleInfo.Guanka.Expend)
+
+		response := new(msg.BattleResultResponse)
+		response.Code = msg.ResponseCode_SUCCESS
+		response.Earn = ConverEarnToMsgEarn(earn)
+		a.WriteMsg(response)
+	}
+}
+
+func handleGuanKaBattle(result int32, gk *entry.GuanKa) *entry.Earn {
 	earn := new(entry.Earn)
 	switch result {
-	case entry.BattleResultStar1:
-		earn.Gold = 100
-		earn.HeroExp = 120
-		earn.PlayerExp = 100
+	case entry.BattleResultStar1,
+		entry.BattleResultStar2,
+		entry.BattleResultStar3:
+		earn.Gold = gk.Earn.Gold
+		earn.HeroExp = gk.Earn.HeroExp
+		earn.PlayerExp = gk.Earn.PlayerExp
 		earn.ItemIds = make([]int32, 0)
+
+		// itemCnt = len(gk.Earn.ItemIds)
+
 		earn.ItemIds = append(earn.ItemIds, 1)
 		earn.ItemIds = append(earn.ItemIds, 2)
-		break
-	case entry.BattleResultStar2:
-	case entry.BattleResultStar3:
 		break
 	case entry.BattleResultStar0:
 		earn.Gold = 0
 		earn.HeroExp = 0
-		earn.PlayerExp = 100
+		earn.PlayerExp = gk.Earn.PlayerExp
+		earn.ItemIds = make([]int32, 0)
 		break
 	}
-
-	data.Module.EffectByEarn(player, earn)
-
-	response := new(msg.BattleResultResponse)
-	response.Code = msg.ResponseCode_SUCCESS
-	response.Earn = ConverEarnToMsgEarn(earn)
-	a.WriteMsg(response)
+	return earn
 }
 
 func handleBattleGuanKa(args []interface{}) {

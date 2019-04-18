@@ -15,8 +15,10 @@ func (m *Module) AllChapters(player *entry.Player) []*entry.Chapter {
 		for i, ch := range m.chapters {
 			chapter := new(entry.Chapter)
 			tool.DeepCopy(chapter, ch)
+			chapter.Status = entry.ChapterStatusLock
 			if i == 0 {
 				chapter.IsOpen = true
+				chapter.Status = entry.ChapterStatusNormal
 			}
 			chapters = append(chapters, chapter)
 		}
@@ -37,8 +39,11 @@ func (m *Module) AllGuanKas(player *entry.Player) []*entry.GuanKa {
 		for i, gk := range m.guanKas {
 			guanKa := new(entry.GuanKa)
 			tool.DeepCopy(guanKa, gk)
+			guanKa.Status = entry.ChapterStatusLock
 			if i == 0 {
 				guanKa.IsOpen = true
+				guanKa.Status = entry.ChapterStatusNormal
+				guanKa.Times = guanKa.TotalTimes
 			}
 			guanKas = append(guanKas, guanKa)
 		}

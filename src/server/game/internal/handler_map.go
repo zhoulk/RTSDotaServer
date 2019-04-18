@@ -57,6 +57,7 @@ func ConverChapterToMsgChapter(v *entry.Chapter) *msg.Chapter {
 	chapter.Id = v.Id
 	chapter.Name = v.Name
 	chapter.IsOpen = v.IsOpen
+	chapter.Status = v.Status
 	return chapter
 }
 
@@ -66,6 +67,10 @@ func ConverGuanKaToMsgGuanKa(v *entry.GuanKa) *msg.GuanKa {
 	guanKa.Name = v.Name
 	guanKa.ChapterId = v.ChapterId
 	guanKa.IsOpen = v.IsOpen
+	guanKa.Status = v.Status
+	guanKa.Star = v.Star
+	guanKa.Times = v.Times
+	guanKa.TotalTimes = v.TotalTimes
 	guanKa.Earn = ConverEarnToMsgEarn(v.Earn)
 	guanKa.Expend = ConverExpendToMsgExpend(v.Expend)
 	return guanKa

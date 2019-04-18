@@ -25,6 +25,7 @@ type Module struct {
 	guanKas        []*entry.GuanKa
 	playerGuanKas  map[string][]*entry.GuanKa
 	groups         []*entry.Group
+	battleCache    map[string]*entry.BattleInfo
 }
 
 func (m *Module) OnInit() {
@@ -38,6 +39,7 @@ func (m *Module) OnInit() {
 	m.items = InitItems()
 	m.chapters = InitChapters()
 	m.guanKas = InitGuanKas()
+	m.battleCache = make(map[string]*entry.BattleInfo)
 }
 
 func (m *Module) OnDestroy() {
