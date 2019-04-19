@@ -49,6 +49,14 @@ func handleBattleCreate(args []interface{}) {
 				a.WriteMsg(response)
 				return
 			}
+			// 次数是否充足
+			if guanKa.Times <= 0 {
+				response := new(msg.BattleCreateResponse)
+				response.Code = msg.ResponseCode_FAIL
+				response.Err = NewErr(define.BattleGuanKaTimesErr)
+				a.WriteMsg(response)
+				return
+			}
 			// 判断体力是否充足
 			if player.BaseInfo.Power < 6 {
 				response := new(msg.BattleCreateResponse)
@@ -106,10 +114,23 @@ func handleBattleResult(args []interface{}) {
 
 		data.Module.EffectByEarn(player, earn)
 		data.Module.EffectByExpend(player, battleInfo.Guanka.Expend)
+		data.Module.UpdateGuanKa(player, battleInfo.Guanka, result)
+
+		gkNotify := new(msg.GuanKaUpdateNotify)
+		gkNotify.GuanKas = make([]*msg.GuanKa, 0)
+		gkNotify.GuanKas = append(gkNotify.GuanKas, ConverGuanKaToMsgGuanKa(battleInfo.Guanka))
+		nextGk := data.Module.FindNextGuanKa(player, battleInfo.Guanka.Id)
+		if nextGk != nil {
+			gkNotify.GuanKas = append(gkNotify.GuanKas, ConverGuanKaToMsgGuanKa(nextGk))
+		}
+		a.WriteMsg(gkNotify)
 
 		response := new(msg.BattleResultResponse)
 		response.Code = msg.ResponseCode_SUCCESS
 		response.Earn = ConverEarnToMsgEarn(earn)
+		response.Level = player.BaseInfo.Level
+		response.Exp = player.BaseInfo.Exp
+		response.LevelUpExp = player.BaseInfo.LevelUpExp
 		a.WriteMsg(response)
 	}
 }

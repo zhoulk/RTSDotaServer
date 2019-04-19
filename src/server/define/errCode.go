@@ -17,6 +17,7 @@ const (
 	BattlePlayerPowerErr int32 = 201
 	BattleNoneHeroErr    int32 = 202
 	BattleResultExistErr int32 = 203
+	BattleGuanKaTimesErr int32 = 204
 
 	SkillUpgradeExistErr int32 = 300
 	SkillUpgradeSPErr    int32 = 301
@@ -42,6 +43,7 @@ var ERRMAP map[int32]string = map[int32]string{
 	BattlePlayerPowerErr: "体力不足",
 	BattleNoneHeroErr:    "没有上阵英雄",
 	BattleResultExistErr: "不存在的战斗",
+	BattleGuanKaTimesErr: "没有战斗次数",
 
 	SkillUpgradeExistErr: "技能不存在",
 	SkillUpgradeSPErr:    "技能点不足",

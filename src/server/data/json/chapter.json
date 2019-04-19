@@ -1,10 +1,12 @@
 [
     {
         "Id"            : 1,
-        "Name"          : "第一章"
+        "Name"          : "第一章",
+        "GuanKaNum" : 5
     },
     {
         "Id"            : 2,
-        "Name"          : "第二章"
+        "Name"          : "第二章",
+        "GuanKaNum" : 5
     }
 ]

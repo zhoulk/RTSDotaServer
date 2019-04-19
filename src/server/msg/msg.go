@@ -57,4 +57,7 @@ func init() {
 	Processor.Register(145, &BattleCreateResponse{})
 	Processor.Register(146, &HeroLotteryRequest{})
 	Processor.Register(147, &HeroLotteryResponse{})
+
+	Processor.Register(1000, &ChapterUpdateNotify{})
+	Processor.Register(1001, &GuanKaUpdateNotify{})
 }

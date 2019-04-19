@@ -58,6 +58,8 @@ func ConverChapterToMsgChapter(v *entry.Chapter) *msg.Chapter {
 	chapter.Name = v.Name
 	chapter.IsOpen = v.IsOpen
 	chapter.Status = v.Status
+	chapter.Star = v.Star
+	chapter.GuanKaNum = v.GuanKaNum
 	return chapter
 }
 
