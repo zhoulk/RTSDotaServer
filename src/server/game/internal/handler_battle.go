@@ -125,6 +125,20 @@ func handleBattleResult(args []interface{}) {
 		}
 		a.WriteMsg(gkNotify)
 
+		chapterNotify := new(msg.ChapterUpdateNotify)
+		chapterNotify.Chapters = make([]*msg.Chapter, 0)
+		chapter := data.Module.FindChapter(player, battleInfo.Guanka.ChapterId)
+		if chapter != nil {
+			chapterNotify.Chapters = append(chapterNotify.Chapters, ConverChapterToMsgChapter(chapter))
+		}
+		if nextGk != nil && nextGk.ChapterId != battleInfo.Guanka.ChapterId {
+			nextChapter := data.Module.FindChapter(player, nextGk.ChapterId)
+			if nextChapter != nil {
+				chapterNotify.Chapters = append(chapterNotify.Chapters, ConverChapterToMsgChapter(nextChapter))
+			}
+		}
+		a.WriteMsg(chapterNotify)
+
 		response := new(msg.BattleResultResponse)
 		response.Code = msg.ResponseCode_SUCCESS
 		response.Earn = ConverEarnToMsgEarn(earn)
