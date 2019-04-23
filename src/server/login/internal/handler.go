@@ -6,7 +6,6 @@ import (
 	"server/data/entry"
 	"server/define"
 	"server/msg"
-	"server/tool"
 
 	"github.com/name5566/leaf/gate"
 	"github.com/name5566/leaf/log"
@@ -40,14 +39,13 @@ func handleRegiste(args []interface{}) {
 		return
 	}
 
-	player = new(entry.Player)
-	player.UserId = tool.UniqueId()
-	player.Account = m.GetAccount()
-	player.Password = m.GetPassword()
-	player.Name = m.GetAccount()
+	player = entry.NewPlayer()
+	player.SetAccount(m.GetAccount())
+	player.SetPassword(m.GetPassword())
+	player.SetName(m.GetAccount())
 
-	player.BaseInfo = entry.NewBaseInfo()
-	player.ExtendInfo = entry.NewExtendInfo()
+	player.SetBaseInfo(entry.NewBaseInfo())
+	player.SetExtendInfo(entry.NewExtendInfo())
 
 	data.Module.SavePlayer(player)
 
@@ -82,6 +80,8 @@ func handleAuth(args []interface{}) {
 }
 
 func handleAllZone(args []interface{}) {
+	log.Debug("[login handleAllZone] ")
+
 	a := args[1].(gate.Agent)
 
 	response := new(msg.ZoneResponse)

@@ -2,6 +2,7 @@ package entry
 
 import (
 	"server/define"
+	"server/tool"
 	"time"
 )
 
@@ -13,6 +14,38 @@ type Player struct {
 
 	BaseInfo   *BaseInfo
 	ExtendInfo *ExtendInfo
+
+	IsDirty bool
+}
+
+func (p *Player) SetUserId(userId string) {
+	p.UserId = userId
+	p.IsDirty = true
+}
+
+func (p *Player) SetAccount(account string) {
+	p.Account = account
+	p.IsDirty = true
+}
+
+func (p *Player) SetPassword(password string) {
+	p.Password = password
+	p.IsDirty = true
+}
+
+func (p *Player) SetName(name string) {
+	p.Name = name
+	p.IsDirty = true
+}
+
+func (p *Player) SetBaseInfo(baseInfo *BaseInfo) {
+	p.BaseInfo = baseInfo
+	p.IsDirty = true
+}
+
+func (p *Player) SetExtendInfo(extendInfo *ExtendInfo) {
+	p.ExtendInfo = extendInfo
+	p.IsDirty = true
 }
 
 type BaseInfo struct {
@@ -41,6 +74,12 @@ type ExtendInfo struct {
 	BetterLotteryCnt           int32
 	NeedGoodLotteryCnt         int32
 	NeedBetterLotteryCnt       int32
+}
+
+func NewPlayer() *Player {
+	player := new(Player)
+	player.UserId = tool.UniqueId()
+	return player
 }
 
 func NewBaseInfo() *BaseInfo {
@@ -81,6 +120,8 @@ func (p *Player) EffectByEarn(earn *Earn) {
 		}
 		p.levelUp()
 	}
+
+	p.IsDirty = true
 }
 
 func (p *Player) levelUp() {

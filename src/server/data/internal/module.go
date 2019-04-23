@@ -4,6 +4,7 @@ import (
 	"server/base"
 	"server/data/entry"
 
+	"github.com/jinzhu/gorm"
 	"github.com/name5566/leaf/log"
 	"github.com/name5566/leaf/module"
 )
@@ -26,6 +27,8 @@ type Module struct {
 	playerGuanKas  map[string][]*entry.GuanKa
 	groups         []*entry.Group
 	battleCache    map[string]*entry.BattleInfo
+
+	db *gorm.DB
 }
 
 func (m *Module) OnInit() {
@@ -40,6 +43,8 @@ func (m *Module) OnInit() {
 	m.chapters = InitChapters()
 	m.guanKas = InitGuanKas()
 	m.battleCache = make(map[string]*entry.BattleInfo)
+
+	m.PersistentData()
 }
 
 func (m *Module) OnDestroy() {
