@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	DB_Driver = "root:A845240287a@tcp(rm-wz9sw694mi8020vigo.mysql.rds.aliyuncs.com:3306)/pixel_farm?charset=utf8"
+	DB_Driver = "root:A845240287a@tcp(rm-wz9sw694mi8020vigo.mysql.rds.aliyuncs.com:3306)/pixel_farm?charset=utf8&&parseTime=true"
 )
 
 func (m *Module) PersistentData() {
@@ -20,6 +20,7 @@ func (m *Module) PersistentData() {
 
 	m.ConnectDB()
 	m.CreateTables()
+	m.LoadFromDB()
 	go m.ExecutePersistent()
 }
 
@@ -39,6 +40,26 @@ func (m *Module) CreateTables() {
 			panic(err)
 		}
 	}
+	if !m.db.HasTable(&UserBaseInfo{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&UserBaseInfo{}).Error; err != nil {
+			panic(err)
+		}
+	}
+}
+
+func (m *Module) LoadFromDB() {
+	// var users []*User
+	// m.db.Find(&users)
+	// for _, user := range users {
+	// 	player := new(entry.Player)
+	// 	player.UserId = user.Uid
+	// 	player.Account = user.Account
+	// 	player.Password = user.Password
+	// 	m.SavePlayer(player)
+	// }
+
+	var user User
+	m.db.First(&user, 2)
 }
 
 func (m *Module) ExecutePersistent() {
@@ -57,12 +78,32 @@ func (m *Module) DoPersistent() {
 		if player.IsDirty {
 			log.Debug("save %v", player)
 
-			user := User{Uid: player.UserId, Account: player.Account, Password: player.Password}
+			user := User{
+				Uid:      player.UserId,
+				Account:  player.Account,
+				Password: player.Password}
 			if m.db.NewRecord(user) {
 				m.db.Create(&user)
 			} else {
 				m.db.Model(&user).Updates(user)
 			}
+
+			userBaseInfo := UserBaseInfo{
+				Uid:        player.UserId,
+				Name:       player.Name,
+				Level:      player.BaseInfo.Level,
+				LevelUpExp: player.BaseInfo.LevelUpExp,
+				Exp:        player.BaseInfo.Exp,
+				Gold:       player.BaseInfo.Gold,
+				Diamond:    player.BaseInfo.Diamond,
+				Power:      player.BaseInfo.Power,
+				MaxPower:   player.BaseInfo.MaxPower}
+			if m.db.NewRecord(userBaseInfo) {
+				m.db.Create(&userBaseInfo)
+			} else {
+				m.db.Model(&userBaseInfo).Updates(userBaseInfo)
+			}
+
 			player.IsDirty = false
 		}
 	}
