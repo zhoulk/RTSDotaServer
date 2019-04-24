@@ -3,8 +3,9 @@ package define
 const (
 	SysRequestArgsErr int32 = 1
 
-	LoginRegisteExistErr  int32 = 501
-	LoginLoginNotExistErr int32 = 502
+	LoginRegisteExistErr     int32 = 501
+	LoginLoginNotExistErr    int32 = 502
+	LoginRegisteAccountExist int32 = 503
 
 	HeroRandomLevelErr   int32 = 100
 	HeroRandomGoldErr    int32 = 101
@@ -29,8 +30,9 @@ const (
 var ERRMAP map[int32]string = map[int32]string{
 	SysRequestArgsErr: "请求参数异常",
 
-	LoginRegisteExistErr:  "用户已存在",
-	LoginLoginNotExistErr: "用户不存在",
+	LoginRegisteExistErr:     "用户已存在",
+	LoginLoginNotExistErr:    "用户不存在",
+	LoginRegisteAccountExist: "账号已存在",
 
 	HeroRandomLevelErr:   "未知随机类型",
 	HeroRandomGoldErr:    "金币不足",

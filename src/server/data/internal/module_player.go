@@ -6,8 +6,10 @@ import (
 )
 
 func (m *Module) FindPlayer(account string, pwd string) *entry.Player {
-	player := m.players[account+"-"+pwd]
-	if player == nil {
+	player := m.players[account]
+	if player != nil && player.Password == pwd {
+
+	} else {
 		for _, p := range m.players {
 			if p.UserId == account {
 				player = p
@@ -18,11 +20,16 @@ func (m *Module) FindPlayer(account string, pwd string) *entry.Player {
 	return player
 }
 
+func (m *Module) IsAccountExist(account string) bool {
+	player := m.players[account]
+	return player != nil
+}
+
 func (m *Module) SavePlayer(player *entry.Player) error {
 	if player == nil || len(player.UserId) == 0 {
 		return errors.New("player is nil or userId length is 0")
 	}
-	m.players[player.Account+"-"+player.Password] = player
+	m.players[player.Account] = player
 	return nil
 }
 

@@ -27,19 +27,28 @@ func handleRegiste(args []interface{}) {
 
 	log.Debug("[login handleRegiste] accountd = " + m.GetAccount() + " password = " + m.GetPassword())
 
-	player := data.Module.FindPlayer(m.GetAccount(), m.GetPassword())
-
-	response := new(msg.RegisteResponse)
-
-	if player != nil {
-		log.Debug("user exist ", player.UserId, player.Name)
+	// 账号是否存在
+	if data.Module.IsAccountExist(m.GetAccount()) {
+		log.Debug("account exist ", m.GetAccount())
+		response := new(msg.RegisteResponse)
 		response.Code = msg.ResponseCode_FAIL
-		response.Err = NewErr(define.LoginRegisteExistErr)
+		response.Err = NewErr(define.LoginRegisteAccountExist)
 		a.WriteMsg(response)
 		return
 	}
 
-	player = entry.NewPlayer()
+	// player := data.Module.FindPlayer(m.GetAccount(), m.GetPassword())
+
+	// if player != nil {
+	// 	log.Debug("user exist ", player.UserId, player.Name)
+	// 	response := new(msg.RegisteResponse)
+	// 	response.Code = msg.ResponseCode_FAIL
+	// 	response.Err = NewErr(define.LoginRegisteExistErr)
+	// 	a.WriteMsg(response)
+	// 	return
+	// }
+
+	player := entry.NewPlayer()
 	player.SetAccount(m.GetAccount())
 	player.SetPassword(m.GetPassword())
 	player.SetName(m.GetAccount())
@@ -49,6 +58,7 @@ func handleRegiste(args []interface{}) {
 
 	data.Module.SavePlayer(player)
 
+	response := new(msg.RegisteResponse)
 	response.Code = msg.ResponseCode_SUCCESS
 	response.Player = ConverPlayerToMsgPlayer(player)
 	a.WriteMsg(response)
@@ -99,7 +109,9 @@ func ConverPlayerToMsgPlayer(v *entry.Player) *msg.Player {
 	player := new(msg.Player)
 	player.UserId = v.UserId
 	player.Name = v.Name
-	player.BaseInfo = ConverBaseInfoToMsgBaseInfo(v.BaseInfo)
+	if v.BaseInfo != nil {
+		player.BaseInfo = ConverBaseInfoToMsgBaseInfo(v.BaseInfo)
+	}
 	return player
 }
 

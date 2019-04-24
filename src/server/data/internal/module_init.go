@@ -36,7 +36,7 @@ func InitHeros() []*entry.Hero {
 		heros = append(heros, hero)
 	}
 
-	log.Debug("%v", heros)
+	// log.Debug("%v", heros)
 
 	return heros
 }

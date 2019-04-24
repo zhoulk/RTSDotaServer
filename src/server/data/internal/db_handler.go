@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"server/data/entry"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -20,7 +21,9 @@ func (m *Module) PersistentData() {
 
 	m.ConnectDB()
 	m.CreateTables()
+	m.IntializeTables()
 	m.LoadFromDB()
+
 	go m.ExecutePersistent()
 }
 
@@ -45,21 +48,76 @@ func (m *Module) CreateTables() {
 			panic(err)
 		}
 	}
+	if !m.db.HasTable(&HeroDefine{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&HeroDefine{}).Error; err != nil {
+			panic(err)
+		}
+	}
+}
+
+func (m *Module) IntializeTables() {
+	heros := InitHeros()
+	for _, hero := range heros {
+		skillStr := ""
+		if hero.SkillIds != nil {
+			for _, skillId := range hero.SkillIds {
+				skillStr = skillStr + string(skillId) + ","
+			}
+		}
+		heroDefine := HeroDefine{
+			HeroId:           hero.Id,
+			Name:             hero.Name,
+			Type:             hero.Type,
+			Strength:         hero.Strength,
+			StrengthStep:     hero.StrengthStep,
+			Agility:          hero.Agility,
+			AgilityStep:      hero.AgilityStep,
+			Intelligence:     hero.Intelligence,
+			IntelligenceStep: hero.IntelligenceStep,
+			Armor:            hero.Armor,
+			AttackMin:        hero.AttackMin,
+			AttackMax:        hero.AttackMax,
+			Blood:            hero.Blood,
+			MP:               hero.MP,
+			SkillIds:         skillStr,
+		}
+		if m.db.NewRecord(heroDefine) {
+			m.db.Create(&heroDefine)
+		} else {
+			m.db.Model(&heroDefine).Updates(heroDefine)
+		}
+	}
 }
 
 func (m *Module) LoadFromDB() {
-	// var users []*User
-	// m.db.Find(&users)
-	// for _, user := range users {
-	// 	player := new(entry.Player)
-	// 	player.UserId = user.Uid
-	// 	player.Account = user.Account
-	// 	player.Password = user.Password
-	// 	m.SavePlayer(player)
-	// }
+	var users []*User
+	m.db.Find(&users)
+	tempPlayers := make(map[string]*entry.Player)
+	for _, user := range users {
+		player := new(entry.Player)
+		player.UserId = user.Uid
+		player.Account = user.Account
+		player.Password = user.Password
+		m.SavePlayer(player)
 
-	var user User
-	m.db.First(&user, 2)
+		tempPlayers[user.Uid] = player
+	}
+
+	var userBaseInfos []*UserBaseInfo
+	m.db.Find(&userBaseInfos)
+	for _, baseInfo := range userBaseInfos {
+		info := new(entry.BaseInfo)
+		info.Level = baseInfo.Level
+		info.Exp = baseInfo.Exp
+		info.LevelUpExp = baseInfo.LevelUpExp
+		info.Diamond = baseInfo.Diamond
+		info.Gold = baseInfo.Gold
+		info.Power = baseInfo.Power
+		info.MaxPower = baseInfo.MaxPower
+		tempPlayers[baseInfo.Uid].BaseInfo = info
+	}
+
+	tempPlayers = make(map[string]*entry.Player)
 }
 
 func (m *Module) ExecutePersistent() {
