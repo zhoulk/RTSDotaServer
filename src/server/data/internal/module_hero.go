@@ -11,6 +11,18 @@ func (m *Module) AllHeros() []*entry.Hero {
 	return m.heros
 }
 
+func (m *Module) HasHero(id int32) bool {
+	exist := false
+	for _, define := range m.heros {
+		if define.Id == id {
+			exist = true
+			break
+		}
+	}
+
+	return exist
+}
+
 func (m *Module) AllOwnHeros(player *entry.Player) []*entry.Hero {
 	if player == nil || len(player.UserId) == 0 {
 		log.Error("[AllOwnHeros ] player is nil or userId length is 0")

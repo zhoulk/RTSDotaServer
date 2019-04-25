@@ -12,6 +12,18 @@ func (m *Module) FindASkill(skillId int32) *entry.Skill {
 	return nil
 }
 
+func (m *Module) HasSkill(id int32) bool {
+	exist := false
+	for _, define := range m.skills {
+		if define.Id == id {
+			exist = true
+			break
+		}
+	}
+
+	return exist
+}
+
 func (m *Module) AllSkills() []*entry.Skill {
 	return m.skills
 }

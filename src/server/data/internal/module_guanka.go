@@ -5,6 +5,30 @@ import (
 	"server/tool"
 )
 
+func (m *Module) HasChapter(id int32) bool {
+	exist := false
+	for _, define := range m.chapters {
+		if define.Id == id {
+			exist = true
+			break
+		}
+	}
+
+	return exist
+}
+
+func (m *Module) HasGuanKa(id int32) bool {
+	exist := false
+	for _, define := range m.guanKas {
+		if define.Id == id {
+			exist = true
+			break
+		}
+	}
+
+	return exist
+}
+
 // AllChapters ...
 func (m *Module) AllChapters(player *entry.Player) []*entry.Chapter {
 	if player == nil || len(player.UserId) == 0 {

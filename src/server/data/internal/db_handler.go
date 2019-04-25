@@ -2,6 +2,7 @@ package internal
 
 import (
 	"server/data/entry"
+	"server/tool"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -21,8 +22,8 @@ func (m *Module) PersistentData() {
 
 	m.ConnectDB()
 	m.CreateTables()
-	m.IntializeTables()
 	m.LoadFromDB()
+	m.IntializeTables()
 
 	go m.ExecutePersistent()
 }
@@ -53,16 +54,52 @@ func (m *Module) CreateTables() {
 			panic(err)
 		}
 	}
+	if !m.db.HasTable(&SkillDefine{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&SkillDefine{}).Error; err != nil {
+			panic(err)
+		}
+	}
+	if !m.db.HasTable(&ChapterDefine{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&ChapterDefine{}).Error; err != nil {
+			panic(err)
+		}
+	}
+	if !m.db.HasTable(&GuanKaDefine{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&GuanKaDefine{}).Error; err != nil {
+			panic(err)
+		}
+	}
+	if !m.db.HasTable(&ItemDefine{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&ItemDefine{}).Error; err != nil {
+			panic(err)
+		}
+	}
+	if !m.db.HasTable(&ItemMixDefine{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&ItemMixDefine{}).Error; err != nil {
+			panic(err)
+		}
+	}
 }
 
 func (m *Module) IntializeTables() {
+	m.IntializeHeroTable()
+	m.IntializeSkillTable()
+	m.IntializeChapterTable()
+	m.IntializeGuanKaTable()
+	m.IntializeItemTable()
+}
+
+func (m *Module) IntializeHeroTable() {
 	heros := InitHeros()
 	for _, hero := range heros {
+
+		if m.HasHero(hero.Id) {
+			continue
+		}
+
 		skillStr := ""
 		if hero.SkillIds != nil {
-			for _, skillId := range hero.SkillIds {
-				skillStr = skillStr + string(skillId) + ","
-			}
+			skillStr = tool.JoinInt32Arr(hero.SkillIds, ",")
 		}
 		heroDefine := HeroDefine{
 			HeroId:           hero.Id,
@@ -81,15 +118,103 @@ func (m *Module) IntializeTables() {
 			MP:               hero.MP,
 			SkillIds:         skillStr,
 		}
-		if m.db.NewRecord(heroDefine) {
-			m.db.Create(&heroDefine)
-		} else {
-			m.db.Model(&heroDefine).Updates(heroDefine)
+		m.db.Create(&heroDefine)
+	}
+}
+
+func (m *Module) IntializeSkillTable() {
+	skills := InitSkills()
+	for _, skill := range skills {
+
+		if m.HasSkill(skill.Id) {
+			continue
+		}
+
+		skillDefine := SkillDefine{
+			SkillId: skill.Id,
+			Name:    skill.Name,
+			Type:    skill.Type,
+			Desc:    skill.Desc,
+		}
+		m.db.Create(&skillDefine)
+	}
+}
+
+func (m *Module) IntializeChapterTable() {
+	chapters := InitChapters()
+	for _, chapter := range chapters {
+
+		if m.HasChapter(chapter.Id) {
+			continue
+		}
+
+		chapterDefine := ChapterDefine{
+			ChapterId: chapter.Id,
+			Name:      chapter.Name,
+			GuanKaNum: chapter.GuanKaNum,
+		}
+		m.db.Create(&chapterDefine)
+	}
+}
+
+func (m *Module) IntializeGuanKaTable() {
+	gks := InitGuanKas()
+	for _, gk := range gks {
+
+		if m.HasGuanKa(gk.Id) {
+			continue
+		}
+
+		gkDefine := GuanKaDefine{
+			GuanKaId:   gk.Id,
+			Name:       gk.Name,
+			ChapterId:  gk.ChapterId,
+			TotalTimes: gk.TotalTimes,
+		}
+		m.db.Create(&gkDefine)
+	}
+}
+
+func (m *Module) IntializeItemTable() {
+	items := InitItems()
+	for _, item := range items {
+
+		if m.HasItem(item.Id) {
+			continue
+		}
+
+		itemDefine := ItemDefine{
+			ItemId: item.Id,
+			Name:   item.Name,
+			Price:  item.Price,
+			Effect: item.Effect,
+			Desc:   item.Desc,
+		}
+		m.db.Create(&itemDefine)
+
+		if item.Mixs != nil {
+			for _, mix := range item.Mixs {
+				mixDefine := ItemMixDefine{
+					ItemId:  item.Id,
+					ChildId: mix.ItemId,
+					Num:     mix.Num,
+				}
+				m.db.Create(&mixDefine)
+			}
 		}
 	}
 }
 
 func (m *Module) LoadFromDB() {
+	m.LoadPlayer()
+	m.LoadHero()
+	m.LoadSkill()
+	m.LoadChapter()
+	m.LoadGuanKa()
+	m.LoadItem()
+}
+
+func (m *Module) LoadPlayer() {
 	var users []*User
 	m.db.Find(&users)
 	tempPlayers := make(map[string]*entry.Player)
@@ -117,7 +242,96 @@ func (m *Module) LoadFromDB() {
 		tempPlayers[baseInfo.Uid].BaseInfo = info
 	}
 
-	tempPlayers = make(map[string]*entry.Player)
+	tempPlayers = nil
+}
+
+func (m *Module) LoadHero() {
+	var heroDefines []*HeroDefine
+	m.db.Find(&heroDefines)
+	for _, define := range heroDefines {
+		hero := new(entry.Hero)
+		hero.Id = define.HeroId
+		hero.Name = define.Name
+		hero.Type = define.Type
+		hero.Strength = define.Strength
+		hero.StrengthStep = define.StrengthStep
+		hero.Agility = define.Agility
+		hero.AgilityStep = define.AgilityStep
+		hero.Intelligence = define.Intelligence
+		hero.IntelligenceStep = define.IntelligenceStep
+		hero.Armor = define.Armor
+		hero.AttackMin = define.AttackMin
+		hero.AttackMax = define.AttackMax
+		hero.Blood = define.Blood
+		hero.MP = define.MP
+		if len(define.SkillIds) > 0 {
+			hero.SkillIds = tool.SpliteInt32Arr(define.SkillIds, ",")
+		}
+		m.heros = append(m.heros, hero)
+	}
+}
+
+func (m *Module) LoadSkill() {
+	var skillDefines []*SkillDefine
+	m.db.Find(&skillDefines)
+	for _, define := range skillDefines {
+		skill := new(entry.Skill)
+		skill.Id = define.SkillId
+		skill.Name = define.Name
+		skill.Type = define.Type
+		skill.Desc = define.Desc
+		m.skills = append(m.skills, skill)
+	}
+}
+
+func (m *Module) LoadChapter() {
+	var chapterDefines []*ChapterDefine
+	m.db.Find(&chapterDefines)
+	for _, define := range chapterDefines {
+		chapter := new(entry.Chapter)
+		chapter.Id = define.ChapterId
+		chapter.Name = define.Name
+		chapter.GuanKaNum = define.GuanKaNum
+		m.chapters = append(m.chapters, chapter)
+	}
+}
+
+func (m *Module) LoadGuanKa() {
+	var gkDefines []*GuanKaDefine
+	m.db.Find(&gkDefines)
+	for _, define := range gkDefines {
+		gk := new(entry.GuanKa)
+		gk.Id = define.GuanKaId
+		gk.Name = define.Name
+		gk.TotalTimes = define.TotalTimes
+		gk.ChapterId = define.ChapterId
+		m.guanKas = append(m.guanKas, gk)
+	}
+}
+
+func (m *Module) LoadItem() {
+	var itemDefines []*ItemDefine
+	m.db.Find(&itemDefines)
+	for _, define := range itemDefines {
+		item := new(entry.Item)
+		item.Id = define.ItemId
+		item.Name = define.Name
+		item.Price = define.Price
+		item.Effect = define.Effect
+		item.Desc = define.Desc
+
+		var mixDefines []*ItemMixDefine
+		m.db.Where("item_id = ?", define.ItemId).Find(&mixDefines)
+		item.Mixs = make([]*entry.Mix, 0)
+		for _, m := range mixDefines {
+			mix := new(entry.Mix)
+			mix.ItemId = m.ChildId
+			mix.Num = m.Num
+			item.Mixs = append(item.Mixs, mix)
+		}
+
+		m.items = append(m.items, item)
+	}
 }
 
 func (m *Module) ExecutePersistent() {

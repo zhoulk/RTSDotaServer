@@ -60,7 +60,7 @@ func InitSkills() []*entry.Skill {
 		skills = append(skills, &skill)
 	}
 
-	log.Debug("%v", skills)
+	//log.Debug("%v", skills)
 
 	return skills
 }
@@ -84,7 +84,7 @@ func InitItems() []*entry.Item {
 		items = append(items, &item)
 	}
 
-	log.Debug("%v", items)
+	//log.Debug("%v", items)
 
 	return items
 }
@@ -108,7 +108,7 @@ func InitChapters() []*entry.Chapter {
 		chapters = append(chapters, &chapter)
 	}
 
-	log.Debug("%v", chapters)
+	//log.Debug("%v", chapters)
 
 	return chapters
 }
@@ -132,7 +132,7 @@ func InitGuanKas() []*entry.GuanKa {
 		guanKas = append(guanKas, &guanKa)
 	}
 
-	log.Debug("%v", guanKas)
+	// log.Debug("%v", guanKas)
 
 	return guanKas
 }
