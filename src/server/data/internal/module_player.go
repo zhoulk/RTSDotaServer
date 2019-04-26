@@ -5,6 +5,18 @@ import (
 	"server/data/entry"
 )
 
+func (m *Module) AllZones() []*entry.Zone {
+	return m.zones
+}
+
+func (m *Module) AllExpHeros() []int32 {
+	return m.heroExpList
+}
+
+func (m *Module) AllExpPlayers() []int32 {
+	return m.playerExpList
+}
+
 func (m *Module) FindPlayer(account string, pwd string) *entry.Player {
 	player := m.players[account]
 	if player != nil && player.Password == pwd {
@@ -52,4 +64,25 @@ func (m *Module) SavePlayerHero(player *entry.Player, hero *entry.Hero) error {
 	m.playerHeros[player.UserId] = heros
 
 	return nil
+}
+
+func (m *Module) EffectPlayerByEarn(p *entry.Player, earn *entry.Earn) {
+	p.BaseInfo.Exp += earn.PlayerExp
+	for {
+		if p.BaseInfo.Exp < p.BaseInfo.LevelUpExp {
+			break
+		}
+		if p.BaseInfo.Level+1 >= int32(len(m.playerExpList)) {
+			break
+		}
+		m.PlayerLevelUp(p)
+	}
+
+	p.IsDirty = true
+}
+
+func (m *Module) PlayerLevelUp(p *entry.Player) {
+	p.BaseInfo.Exp -= p.BaseInfo.LevelUpExp
+	p.BaseInfo.Level += 1
+	p.BaseInfo.LevelUpExp = m.playerExpList[p.BaseInfo.Level]
 }

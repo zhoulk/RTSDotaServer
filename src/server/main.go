@@ -34,7 +34,7 @@ func main() {
 
 	log.Debug("[Start] %v[%v]", serverId, zone)
 
-	conf.Server.MaxConnNum = zone.MaxConnNum
+	conf.Server.MaxConnNum = int(zone.MaxConnNum)
 	conf.Server.TCPAddr = zone.TCPAddr
 
 	// lconf.LogLevel = conf.Server.LogLevel

@@ -49,6 +49,39 @@ type Hero struct {
 
 	Buffs    []*Buff
 	TempAttr *TempAttr
+
+	IsDirty bool
+}
+
+func NewHero() *Hero {
+	hero := new(Hero)
+
+	return hero
+}
+
+func (h *Hero) SetHeroId(heroId string) {
+	h.HeroId = heroId
+	h.IsDirty = true
+}
+
+func (h *Hero) SetPlayerId(playerId string) {
+	h.PlayerId = playerId
+	h.IsDirty = true
+}
+
+func (h *Hero) SetStrength(strength int32) {
+	h.Strength = strength
+	h.IsDirty = true
+}
+
+func (h *Hero) SetAgility(agility int32) {
+	h.Agility = agility
+	h.IsDirty = true
+}
+
+func (h *Hero) SetIntelligence(intelligence int32) {
+	h.Intelligence = intelligence
+	h.IsDirty = true
 }
 
 const (
@@ -174,48 +207,6 @@ func (h *Hero) CanAttack(timer int32) bool {
 		}
 	}
 	return false
-}
-
-func (h *Hero) EffectByEarn(earn *Earn) {
-	h.Exp += earn.HeroExp
-	for {
-		if h.Exp < h.LevelUpExp {
-			break
-		}
-		if h.Level+1 >= int32(len(heroExpList)) {
-			break
-		}
-		h.levelUp()
-	}
-}
-
-func (h *Hero) levelUp() {
-	h.Exp -= h.LevelUpExp
-	h.Level += 1
-	h.SkillPoint += 1
-	h.Strength += h.StrengthStep
-	h.Agility += h.AgilityStep
-	h.Intelligence += h.IntelligenceStep
-	h.MaxBlood += h.StrengthStep * 25 / 100
-	h.Blood = h.MaxBlood
-	h.MaxMP += h.IntelligenceStep * 20 / 100
-	h.MP = h.MaxMP
-
-	switch h.Type {
-	case HeroTypeStrength:
-		h.AttackMin += h.StrengthStep
-		h.AttackMax += h.StrengthStep
-		break
-	case HeroTypeAgility:
-		h.AttackMin += h.AgilityStep
-		h.AttackMax += h.AgilityStep
-		break
-	case HeroTypeIntelligence:
-		h.AttackMin += h.IntelligenceStep
-		h.AttackMax += h.IntelligenceStep
-		break
-	}
-	h.LevelUpExp = heroExpList[h.Level]
 }
 
 func (h *Hero) AddBuff(buff *Buff) {

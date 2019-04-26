@@ -126,10 +126,10 @@ func handleRandomHero(args []interface{}) {
 			response.Err = err
 		} else {
 			rd := rand.Intn(len(heros))
-			hero := new(entry.Hero)
+			hero := entry.NewHero()
 			tool.DeepCopy(hero, heros[rd])
-			hero.HeroId = tool.UniqueId()
-			hero.PlayerId = player.UserId
+			hero.SetHeroId(tool.UniqueId())
+			hero.SetPlayerId(player.UserId)
 			data.Module.SavePlayerHero(player, hero)
 
 			if player.ExtendInfo.FreeGoodLottery > 0 {

@@ -22,6 +22,9 @@ type Module struct {
 	skills         []*entry.Skill
 	items          []*entry.Item
 	chapters       []*entry.Chapter
+	zones          []*entry.Zone
+	playerExpList  []int32
+	heroExpList    []int32
 	playerChapters map[string][]*entry.Chapter
 	guanKas        []*entry.GuanKa
 	playerGuanKas  map[string][]*entry.GuanKa
@@ -42,6 +45,9 @@ func (m *Module) OnInit() {
 	m.chapters = make([]*entry.Chapter, 0)
 	m.guanKas = make([]*entry.GuanKa, 0)
 	m.items = make([]*entry.Item, 0)
+	m.zones = make([]*entry.Zone, 0)
+	m.playerExpList = make([]int32, 0)
+	m.heroExpList = make([]int32, 0)
 	//m.heros = InitHeros()
 	//m.skills = InitSkills()
 	//m.items = InitItems()
@@ -59,11 +65,11 @@ func (m *Module) OnDestroy() {
 func (m *Module) EffectByEarn(player *entry.Player, earn *entry.Earn) {
 	log.Debug("[Module EffectByEarn ] %v", earn)
 	// 角色升级
-	player.EffectByEarn(earn)
+	m.EffectPlayerByEarn(player, earn)
 	// 英雄升级
 	selelctHeros := m.SelectHeros(player)
 	for _, hero := range selelctHeros {
-		hero.EffectByEarn(earn)
+		m.EffectHeroByEarn(hero, earn)
 	}
 }
 

@@ -108,24 +108,3 @@ func NewExtendInfo() *ExtendInfo {
 	extendInfo.NeedBetterLotteryCnt = 10
 	return extendInfo
 }
-
-func (p *Player) EffectByEarn(earn *Earn) {
-	p.BaseInfo.Exp += earn.PlayerExp
-	for {
-		if p.BaseInfo.Exp < p.BaseInfo.LevelUpExp {
-			break
-		}
-		if p.BaseInfo.Level+1 >= int32(len(playerExpList)) {
-			break
-		}
-		p.levelUp()
-	}
-
-	p.IsDirty = true
-}
-
-func (p *Player) levelUp() {
-	p.BaseInfo.Exp -= p.BaseInfo.LevelUpExp
-	p.BaseInfo.Level += 1
-	p.BaseInfo.LevelUpExp = playerExpList[p.BaseInfo.Level]
-}

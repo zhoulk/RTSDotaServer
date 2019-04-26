@@ -4,6 +4,16 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+type Zone struct {
+	ZoneId     string `gorm:"size:64;unique;not null"`
+	TCPAddr    string `gorm:"size:32"`
+	MaxConnNum int32
+	Name       string `gorm:"size:64"`
+	IsNew      bool
+
+	gorm.Model
+}
+
 type User struct {
 	Uid      string `gorm:"size:64;unique;not null"`
 	Account  string `gorm:"size:128"`
@@ -22,6 +32,22 @@ type UserBaseInfo struct {
 	Power      int32
 	MaxPower   int32
 	Level      int32
+
+	gorm.Model
+}
+
+type UserTarvern struct {
+	Uid                        string `gorm:"size:64;unique;not null"`
+	FreeGoodLottery            int32
+	FreeBetterLottery          int32
+	MaxFreeGoodLottery         int32
+	MaxFreeBetterLottery       int32
+	LastFreeGoodLotteryStamp   int64
+	LastFreeBetterLotteryStamp int64
+	GoodLotteryCnt             int32
+	BetterLotteryCnt           int32
+	NeedGoodLotteryCnt         int32
+	NeedBetterLotteryCnt       int32
 
 	gorm.Model
 }
@@ -78,6 +104,30 @@ type GuanKaDefine struct {
 	gorm.Model
 }
 
+type GuanKaExpendDefine struct {
+	GuanKaId int32 `gorm:"unique;not null"`
+	Power    int32
+
+	gorm.Model
+}
+
+type GuanKaEarnDefine struct {
+	GuanKaId  int32  `gorm:"unique;not null"`
+	ItemIds   string `gorm:"size:128"`
+	HeroExp   int32
+	PlayerExp int32
+	Gold      int32
+
+	gorm.Model
+}
+
+type GuanKaHeroDefine struct {
+	GuanKaId int32  `gorm:"not null"`
+	HeroId   string `gorm:"size:128"`
+
+	gorm.Model
+}
+
 type ItemDefine struct {
 	ItemId int32  `gorm:"unique;not null"`
 	Name   string `gorm:"size:16"`
@@ -92,6 +142,49 @@ type ItemMixDefine struct {
 	ItemId  int32
 	ChildId int32
 	Num     int32
+
+	gorm.Model
+}
+
+type ExpHeroDefine struct {
+	Level int32 `gorm:"unique;not null"`
+	Exp   int32
+
+	gorm.Model
+}
+
+type ExpPlayerDefine struct {
+	Level int32 `gorm:"unique;not null"`
+	Exp   int32
+
+	gorm.Model
+}
+
+type UserHero struct {
+	Uid              string `gorm:"size:64;not null"`
+	HeroId           string `gorm:"size:64;unique;not null"`
+	HeroDefineId     int32
+	Strength         int32
+	StrengthStep     int32
+	Agility          int32
+	AgilityStep      int32
+	Intelligence     int32
+	IntelligenceStep int32
+	Armor            int32
+	AttackMin        int32
+	AttackMax        int32
+	Blood            int32
+	MP               int32
+
+	gorm.Model
+}
+
+type UserHeroSkill struct {
+	HeroId        string `gorm:"size:64;not null"`
+	SkillId       string `gorm:"size:64;unique;not null"`
+	SkillDefineId int32
+	Level         int32
+	IsOpen        bool
 
 	gorm.Model
 }

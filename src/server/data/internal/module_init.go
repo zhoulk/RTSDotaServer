@@ -137,6 +137,26 @@ func InitGuanKas() []*entry.GuanKa {
 	return guanKas
 }
 
+func InitExpList() entry.Exp {
+	m, _ := ReadFile("data/json/exp.json")
+
+	var exp entry.Exp
+	if m != nil && len(m) > 0 {
+		bytes, err := json.Marshal(m[0])
+		if err != nil {
+			log.Debug("err was %v", err)
+		}
+		err = json.Unmarshal(bytes, &exp)
+		if err != nil {
+			log.Debug("err was %v", err)
+		}
+	}
+	return exp
+
+	// log.Debug("[playerExpList ] %v", playerExpList)
+	// log.Debug("[heroExpList ] %v", heroExpList)
+}
+
 func ReadFile(path string) ([]interface{}, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {

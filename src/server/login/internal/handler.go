@@ -98,7 +98,7 @@ func handleAllZone(args []interface{}) {
 
 	response.Code = msg.ResponseCode_SUCCESS
 	response.Zones = make([]*msg.Zone, 0)
-	for _, z := range entry.ZoneList {
+	for _, z := range data.Module.AllZones() {
 		response.Zones = append(response.Zones, ConverZoneToMsgZone(z))
 	}
 

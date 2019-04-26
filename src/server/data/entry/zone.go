@@ -11,7 +11,7 @@ import (
 type Zone struct {
 	Id         string
 	TCPAddr    string
-	MaxConnNum int
+	MaxConnNum int32
 	Name       string
 	IsNew      bool
 }
