@@ -59,6 +59,11 @@ func NewHero() *Hero {
 	return hero
 }
 
+func (h *Hero) SetLevel(level int32) {
+	h.Level = level
+	h.IsDirty = true
+}
+
 func (h *Hero) SetHeroId(heroId string) {
 	h.HeroId = heroId
 	h.IsDirty = true
@@ -81,6 +86,51 @@ func (h *Hero) SetAgility(agility int32) {
 
 func (h *Hero) SetIntelligence(intelligence int32) {
 	h.Intelligence = intelligence
+	h.IsDirty = true
+}
+
+func (h *Hero) SetAttackMin(attackMin int32) {
+	h.AttackMin = attackMin
+	h.IsDirty = true
+}
+
+func (h *Hero) SetAttackMax(attackMax int32) {
+	h.AttackMax = attackMax
+	h.IsDirty = true
+}
+
+func (h *Hero) SetBlood(blood int32) {
+	h.Blood = blood
+	h.IsDirty = true
+}
+
+func (h *Hero) SetMaxBlood(maxBlood int32) {
+	h.MaxBlood = maxBlood
+	h.IsDirty = true
+}
+
+func (h *Hero) SetMP(MP int32) {
+	h.MP = MP
+	h.IsDirty = true
+}
+
+func (h *Hero) SetMaxMP(maxMP int32) {
+	h.MaxMP = maxMP
+	h.IsDirty = true
+}
+
+func (h *Hero) SetExp(exp int32) {
+	h.Exp = exp
+	h.IsDirty = true
+}
+
+func (h *Hero) SetLevelUpExp(levelUpExp int32) {
+	h.LevelUpExp = levelUpExp
+	h.IsDirty = true
+}
+
+func (h *Hero) SetSkillPoint(skillPoint int32) {
+	h.SkillPoint = skillPoint
 	h.IsDirty = true
 }
 

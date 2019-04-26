@@ -130,6 +130,13 @@ func handleRandomHero(args []interface{}) {
 			tool.DeepCopy(hero, heros[rd])
 			hero.SetHeroId(tool.UniqueId())
 			hero.SetPlayerId(player.UserId)
+			hero.SetExp(0)
+			hero.SetLevel(1)
+			hero.SetLevelUpExp(90)
+			hero.SetSkillPoint(1)
+			hero.SetMaxBlood(hero.Blood)
+			hero.SetMaxMP(hero.MP)
+
 			data.Module.SavePlayerHero(player, hero)
 
 			if player.ExtendInfo.FreeGoodLottery > 0 {
@@ -156,8 +163,15 @@ func handleRandomHero(args []interface{}) {
 			rd := rand.Intn(len(heros))
 			hero := new(entry.Hero)
 			tool.DeepCopy(hero, heros[rd])
-			hero.HeroId = tool.UniqueId()
-			hero.PlayerId = player.UserId
+			hero.SetHeroId(tool.UniqueId())
+			hero.SetPlayerId(player.UserId)
+			hero.SetExp(0)
+			hero.SetLevel(1)
+			hero.SetLevelUpExp(90)
+			hero.SetSkillPoint(1)
+			hero.SetMaxBlood(hero.Blood)
+			hero.SetMaxMP(hero.MP)
+
 			data.Module.SavePlayerHero(player, hero)
 
 			if player.ExtendInfo.FreeBetterLottery > 0 {

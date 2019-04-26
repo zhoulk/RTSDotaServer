@@ -130,7 +130,7 @@ func (m *Module) SelectHeros(player *entry.Player) []*entry.Hero {
 }
 
 func (m *Module) EffectHeroByEarn(h *entry.Hero, earn *entry.Earn) {
-	h.Exp += earn.HeroExp
+	h.SetExp(h.Exp + earn.HeroExp)
 	for {
 		if h.Exp < h.LevelUpExp {
 			break
@@ -143,30 +143,30 @@ func (m *Module) EffectHeroByEarn(h *entry.Hero, earn *entry.Earn) {
 }
 
 func (m *Module) HeroLevelUp(h *entry.Hero) {
-	h.Exp -= h.LevelUpExp
-	h.Level += 1
-	h.SkillPoint += 1
+	h.SetExp(h.Exp - h.LevelUpExp)
+	h.SetLevel(h.Level + 1)
+	h.SetSkillPoint(h.SkillPoint + 1)
 	h.SetStrength(h.Strength + h.StrengthStep)
 	h.SetAgility(h.Agility + h.AgilityStep)
 	h.SetIntelligence(h.Intelligence + h.IntelligenceStep)
-	h.MaxBlood += h.StrengthStep * 25 / 100
-	h.Blood = h.MaxBlood
-	h.MaxMP += h.IntelligenceStep * 20 / 100
-	h.MP = h.MaxMP
+	h.SetMaxBlood(h.MaxBlood + h.StrengthStep*25/100)
+	h.SetBlood(h.MaxBlood)
+	h.SetMaxMP(h.MaxMP + h.IntelligenceStep*20/100)
+	h.SetMP(h.MaxMP)
 
 	switch h.Type {
 	case entry.HeroTypeStrength:
-		h.AttackMin += h.StrengthStep
-		h.AttackMax += h.StrengthStep
+		h.SetAttackMin(h.AttackMin + h.StrengthStep)
+		h.SetAttackMax(h.AttackMax + h.StrengthStep)
 		break
 	case entry.HeroTypeAgility:
-		h.AttackMin += h.AgilityStep
-		h.AttackMax += h.AgilityStep
+		h.SetAttackMin(h.AttackMin + h.AgilityStep)
+		h.SetAttackMax(h.AttackMax + h.AgilityStep)
 		break
 	case entry.HeroTypeIntelligence:
-		h.AttackMin += h.IntelligenceStep
-		h.AttackMax += h.IntelligenceStep
+		h.SetAttackMin(h.AttackMin + h.IntelligenceStep)
+		h.SetAttackMax(h.AttackMax + h.IntelligenceStep)
 		break
 	}
-	h.LevelUpExp = m.heroExpList[h.Level]
+	h.SetLevelUpExp(m.heroExpList[h.Level])
 }

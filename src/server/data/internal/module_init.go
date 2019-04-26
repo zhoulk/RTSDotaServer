@@ -26,13 +26,6 @@ func InitHeros() []*entry.Hero {
 		if err != nil {
 			log.Debug("err was %v", err)
 		}
-
-		hero.Exp = 0
-		hero.Level = 1
-		hero.LevelUpExp = 90
-		hero.SkillPoint = 1
-		hero.MaxBlood = hero.Blood
-		hero.MaxMP = hero.MP
 		heros = append(heros, hero)
 	}
 

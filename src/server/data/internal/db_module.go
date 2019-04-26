@@ -164,6 +164,9 @@ type UserHero struct {
 	Uid              string `gorm:"size:64;not null"`
 	HeroId           string `gorm:"size:64;unique;not null"`
 	HeroDefineId     int32
+	Level            int32
+	Exp              int32
+	LevelUpExp       int32
 	Strength         int32
 	StrengthStep     int32
 	Agility          int32

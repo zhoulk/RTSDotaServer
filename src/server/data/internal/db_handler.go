@@ -298,6 +298,7 @@ func (m *Module) LoadFromDB() {
 	m.LoadGuanKa()
 	m.LoadItem()
 	m.LoadExp()
+	m.LoadUserHero()
 	log.Debug("loading data from db end ...")
 }
 
@@ -343,6 +344,26 @@ func (m *Module) LoadPlayer() {
 		info.MaxPower = baseInfo.MaxPower
 		tempPlayers[baseInfo.Uid].Name = baseInfo.Name
 		tempPlayers[baseInfo.Uid].BaseInfo = info
+	}
+
+	var userTarverns []UserTarvern
+	m.db.Find(&userTarverns)
+	for _, userTarvern := range userTarverns {
+		extendInfo := tempPlayers[userTarvern.Uid].ExtendInfo
+		if extendInfo == nil {
+			extendInfo = new(entry.ExtendInfo)
+		}
+		extendInfo.FreeGoodLottery = userTarvern.FreeGoodLottery
+		extendInfo.FreeBetterLottery = userTarvern.FreeBetterLottery
+		extendInfo.MaxFreeGoodLottery = userTarvern.MaxFreeGoodLottery
+		extendInfo.MaxFreeBetterLottery = userTarvern.MaxFreeBetterLottery
+		extendInfo.NeedGoodLotteryCnt = userTarvern.NeedGoodLotteryCnt
+		extendInfo.NeedBetterLotteryCnt = userTarvern.NeedBetterLotteryCnt
+		extendInfo.LastFreeGoodLotteryStamp = userTarvern.LastFreeGoodLotteryStamp
+		extendInfo.LastFreeBetterLotteryStamp = userTarvern.LastFreeBetterLotteryStamp
+		extendInfo.GoodLotteryCnt = userTarvern.GoodLotteryCnt
+		extendInfo.BetterLotteryCnt = userTarvern.BetterLotteryCnt
+		tempPlayers[userTarvern.Uid].ExtendInfo = extendInfo
 	}
 
 	tempPlayers = nil
@@ -479,6 +500,39 @@ func (m *Module) LoadExp() {
 	log.Debug("load exps player  db %v  mem %v", len(expPlayerDefines), len(m.playerExpList))
 }
 
+func (m *Module) LoadUserHero() {
+	var userHeros []UserHero
+	m.db.Find(&userHeros)
+	for _, define := range userHeros {
+		heros := m.playerHeros[define.Uid]
+		if heros == nil {
+			heros = make([]*entry.Hero, 0)
+		}
+		hero := new(entry.Hero)
+		hero.Level = define.Level
+		hero.Exp = define.Exp
+		hero.LevelUpExp = define.LevelUpExp
+		hero.Strength = define.Strength
+		hero.StrengthStep = define.StrengthStep
+		hero.Agility = define.Agility
+		hero.AgilityStep = define.AgilityStep
+		hero.Intelligence = define.Intelligence
+		hero.IntelligenceStep = define.IntelligenceStep
+		hero.AttackMin = define.AttackMin
+		hero.AttackMax = define.AttackMax
+		hero.Armor = define.Armor
+		hero.MaxBlood = define.Blood
+		hero.MaxMP = define.MP
+		heros = append(heros, hero)
+		m.playerHeros[define.Uid] = heros
+	}
+	cnt := 0
+	for _, heros := range m.playerHeros {
+		cnt += len(heros)
+	}
+	log.Debug("load user hero  db %v  mem %v", len(userHeros), cnt)
+}
+
 func (m *Module) ExecutePersistent() {
 	timer := time.NewTicker(10 * time.Second)
 	for {
@@ -506,6 +560,9 @@ func (m *Module) PersistentUserHero() {
 					Uid:              uid,
 					HeroId:           hero.HeroId,
 					HeroDefineId:     hero.Id,
+					Level:            hero.Level,
+					Exp:              hero.Exp,
+					LevelUpExp:       hero.LevelUpExp,
 					Strength:         hero.Strength,
 					StrengthStep:     hero.StrengthStep,
 					Agility:          hero.Agility,
@@ -515,8 +572,8 @@ func (m *Module) PersistentUserHero() {
 					Armor:            hero.Armor,
 					AttackMin:        hero.AttackMin,
 					AttackMax:        hero.AttackMax,
-					Blood:            hero.Blood,
-					MP:               hero.MP,
+					Blood:            hero.MaxBlood,
+					MP:               hero.MaxMP,
 				}
 
 				var oldUserHero UserHero
@@ -532,7 +589,7 @@ func (m *Module) PersistentUserHero() {
 			}
 		}
 	}
-	log.Debug("persistent user %v ", cnt)
+	log.Debug("persistent user hero %v ", cnt)
 }
 
 func (m *Module) PersistentUser() {
@@ -542,12 +599,8 @@ func (m *Module) PersistentUser() {
 			user := User{
 				Uid:      player.UserId,
 				Account:  player.Account,
-				Password: player.Password}
-			// if m.db.NewRecord(user) {
-			// 	m.db.Create(&user)
-			// } else {
-			// 	m.db.Model(&user).Updates(user)
-			// }
+				Password: player.Password,
+			}
 
 			var oldUser User
 			m.db.Where("uid = ?", user.Uid).First(&oldUser)
@@ -566,12 +619,8 @@ func (m *Module) PersistentUser() {
 				Gold:       player.BaseInfo.Gold,
 				Diamond:    player.BaseInfo.Diamond,
 				Power:      player.BaseInfo.Power,
-				MaxPower:   player.BaseInfo.MaxPower}
-			// if m.db.NewRecord(userBaseInfo) {
-			// 	m.db.Create(&userBaseInfo)
-			// } else {
-			// 	m.db.Model(&userBaseInfo).Updates(userBaseInfo)
-			// }
+				MaxPower:   player.BaseInfo.MaxPower,
+			}
 
 			var oldUserInfo UserBaseInfo
 			m.db.Where("uid = ?", userBaseInfo.Uid).First(&oldUserInfo)
@@ -579,6 +628,28 @@ func (m *Module) PersistentUser() {
 				m.db.Create(&userBaseInfo)
 			} else {
 				m.db.Model(&userBaseInfo).Updates(userBaseInfo)
+			}
+
+			userTarvern := UserTarvern{
+				Uid:                        player.UserId,
+				FreeGoodLottery:            player.ExtendInfo.FreeGoodLottery,
+				FreeBetterLottery:          player.ExtendInfo.FreeBetterLottery,
+				MaxFreeGoodLottery:         player.ExtendInfo.MaxFreeGoodLottery,
+				MaxFreeBetterLottery:       player.ExtendInfo.MaxFreeBetterLottery,
+				LastFreeGoodLotteryStamp:   player.ExtendInfo.LastFreeGoodLotteryStamp,
+				LastFreeBetterLotteryStamp: player.ExtendInfo.LastFreeBetterLotteryStamp,
+				GoodLotteryCnt:             player.ExtendInfo.GoodLotteryCnt,
+				BetterLotteryCnt:           player.ExtendInfo.BetterLotteryCnt,
+				NeedGoodLotteryCnt:         player.ExtendInfo.NeedGoodLotteryCnt,
+				NeedBetterLotteryCnt:       player.ExtendInfo.NeedBetterLotteryCnt,
+			}
+
+			var oldUserTarvern UserTarvern
+			m.db.Where("uid = ?", userTarvern.Uid).First(&oldUserTarvern)
+			if userTarvern.Uid != oldUserTarvern.Uid {
+				m.db.Create(&userTarvern)
+			} else {
+				m.db.Model(&userTarvern).Updates(userTarvern)
 			}
 
 			cnt++
