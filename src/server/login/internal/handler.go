@@ -6,6 +6,7 @@ import (
 	"server/data/entry"
 	"server/define"
 	"server/msg"
+	"time"
 
 	"github.com/name5566/leaf/gate"
 	"github.com/name5566/leaf/log"
@@ -53,8 +54,8 @@ func handleRegiste(args []interface{}) {
 	player.SetPassword(m.GetPassword())
 	player.SetName(m.GetAccount())
 
-	player.SetBaseInfo(entry.NewBaseInfo())
-	player.SetExtendInfo(entry.NewExtendInfo())
+	player.BaseInfo = entry.NewBaseInfo()
+	player.ExtendInfo = entry.NewExtendInfo()
 
 	data.Module.SavePlayer(player)
 
@@ -79,6 +80,8 @@ func handleAuth(args []interface{}) {
 		a.WriteMsg(response)
 		return
 	}
+
+	player.SetLoginTime(time.Now())
 
 	log.Debug("user exist ", player.UserId, player.Name)
 

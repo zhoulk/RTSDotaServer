@@ -24,6 +24,9 @@ type Chapter struct {
 	Status    int32
 	GuanKaNum int32
 	IsOpen    bool
+
+	ChapterId string
+	IsDirty   bool
 }
 
 type GuanKa struct {
@@ -38,6 +41,9 @@ type GuanKa struct {
 	Status     int32
 	Times      int32
 	TotalTimes int32
+
+	GuanKaId string
+	IsDirty  bool
 }
 
 type Earn struct {
@@ -50,6 +56,63 @@ type Earn struct {
 
 type Expend struct {
 	Power int32
+}
+
+func NewChapter() *Chapter {
+	chapter := new(Chapter)
+	chapter.IsDirty = true
+	return chapter
+}
+
+func (c *Chapter) SetChapterId(chapterId string) {
+	c.ChapterId = chapterId
+	c.IsDirty = true
+}
+
+func (c *Chapter) SetOpen(open bool) {
+	c.IsOpen = open
+	c.IsDirty = true
+}
+
+func (c *Chapter) SetStatus(status int32) {
+	c.Status = status
+	c.IsDirty = true
+}
+
+func (c *Chapter) SetStar(star int32) {
+	c.Star = star
+	c.IsDirty = true
+}
+
+func NewGuanKa() *GuanKa {
+	gk := new(GuanKa)
+	gk.IsDirty = true
+	return gk
+}
+
+func (g *GuanKa) SetGuanKaId(gkId string) {
+	g.GuanKaId = gkId
+	g.IsDirty = true
+}
+
+func (g *GuanKa) SetOpen(open bool) {
+	g.IsOpen = open
+	g.IsDirty = true
+}
+
+func (g *GuanKa) SetStatus(status int32) {
+	g.Status = status
+	g.IsDirty = true
+}
+
+func (g *GuanKa) SetStar(star int32) {
+	g.Star = star
+	g.IsDirty = true
+}
+
+func (g *GuanKa) SetTimes(times int32) {
+	g.Times = times
+	g.IsDirty = true
 }
 
 func (c *Chapter) String() string {

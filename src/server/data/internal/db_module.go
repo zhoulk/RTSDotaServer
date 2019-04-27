@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"time"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -15,9 +17,11 @@ type Zone struct {
 }
 
 type User struct {
-	Uid      string `gorm:"size:64;unique;not null"`
-	Account  string `gorm:"size:128"`
-	Password string `gorm:"size:64"`
+	Uid        string `gorm:"size:64;unique;not null"`
+	Account    string `gorm:"size:128"`
+	Password   string `gorm:"size:64"`
+	LoginTime  time.Time
+	LogoutTime time.Time
 
 	gorm.Model
 }
@@ -32,6 +36,7 @@ type UserBaseInfo struct {
 	Power      int32
 	MaxPower   int32
 	Level      int32
+	Military   int32
 
 	gorm.Model
 }
@@ -178,6 +183,8 @@ type UserHero struct {
 	AttackMax        int32
 	Blood            int32
 	MP               int32
+	IsSelect         bool
+	Pos              int32
 
 	gorm.Model
 }
@@ -188,6 +195,53 @@ type UserHeroSkill struct {
 	SkillDefineId int32
 	Level         int32
 	IsOpen        bool
+
+	gorm.Model
+}
+
+type UserChapter struct {
+	Uid             string `gorm:"size:64;not null"`
+	ChapterId       string `gorm:"size:64;unique;not null"`
+	ChapterDefineId int32
+	Star            int32
+	Status          int32
+	IsOpen          bool
+
+	gorm.Model
+}
+
+type UserGuanKa struct {
+	Uid            string `gorm:"size:64;not null"`
+	GuanKaId       string `gorm:"size:64;unique;not null"`
+	GuanKaDefineId int32
+	Star           int32
+	Status         int32
+	IsOpen         bool
+	Times          int32
+
+	gorm.Model
+}
+
+type Group struct {
+	GroupId          string `gorm:"size:64;unique;not null"`
+	GroupName        string `gorm:"size:16"`
+	GroupLeader      string `gorm:"size:64"`
+	GroupDeclaration string `gorm:"size:128"`
+	MemberCnt        int32
+	MemberTotal      int32
+	GroupLevel       int32
+	ContriCurrent    int32
+	ContriLevelUp    int32
+
+	gorm.Model
+}
+
+type GroupMember struct {
+	GroupId     string `gorm:"size:64;not null"`
+	UserId      string `gorm:"size:64;unique;not null"`
+	ContriToday int32
+	ContriTotal int32
+	Job         int32
 
 	gorm.Model
 }

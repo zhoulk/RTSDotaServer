@@ -125,6 +125,26 @@ func (m *Module) CreateTables() {
 			panic(err)
 		}
 	}
+	if !m.db.HasTable(&UserChapter{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&UserChapter{}).Error; err != nil {
+			panic(err)
+		}
+	}
+	if !m.db.HasTable(&UserGuanKa{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&UserGuanKa{}).Error; err != nil {
+			panic(err)
+		}
+	}
+	if !m.db.HasTable(&Group{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&Group{}).Error; err != nil {
+			panic(err)
+		}
+	}
+	if !m.db.HasTable(&GroupMember{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&GroupMember{}).Error; err != nil {
+			panic(err)
+		}
+	}
 }
 
 func (m *Module) IntializeTables() {
@@ -299,6 +319,8 @@ func (m *Module) LoadFromDB() {
 	m.LoadItem()
 	m.LoadExp()
 	m.LoadUserHero()
+	m.LoadUserChapter()
+	m.LoadUserGuanKa()
 	log.Debug("loading data from db end ...")
 }
 
@@ -326,6 +348,8 @@ func (m *Module) LoadPlayer() {
 		player.UserId = user.Uid
 		player.Account = user.Account
 		player.Password = user.Password
+		player.LoginTime = user.LoginTime
+		player.LogoutTime = user.LogoutTime
 		m.SavePlayer(player)
 
 		tempPlayers[user.Uid] = player
@@ -334,6 +358,9 @@ func (m *Module) LoadPlayer() {
 	var userBaseInfos []*UserBaseInfo
 	m.db.Find(&userBaseInfos)
 	for _, baseInfo := range userBaseInfos {
+		if tempPlayers[baseInfo.Uid] == nil {
+			continue
+		}
 		info := new(entry.BaseInfo)
 		info.Level = baseInfo.Level
 		info.Exp = baseInfo.Exp
@@ -342,6 +369,7 @@ func (m *Module) LoadPlayer() {
 		info.Gold = baseInfo.Gold
 		info.Power = baseInfo.Power
 		info.MaxPower = baseInfo.MaxPower
+		info.Military = baseInfo.Military
 		tempPlayers[baseInfo.Uid].Name = baseInfo.Name
 		tempPlayers[baseInfo.Uid].BaseInfo = info
 	}
@@ -349,6 +377,9 @@ func (m *Module) LoadPlayer() {
 	var userTarverns []UserTarvern
 	m.db.Find(&userTarverns)
 	for _, userTarvern := range userTarverns {
+		if tempPlayers[userTarvern.Uid] == nil {
+			continue
+		}
 		extendInfo := tempPlayers[userTarvern.Uid].ExtendInfo
 		if extendInfo == nil {
 			extendInfo = new(entry.ExtendInfo)
@@ -390,6 +421,8 @@ func (m *Module) LoadHero() {
 		hero.AttackMax = define.AttackMax
 		hero.Blood = define.Blood
 		hero.MP = define.MP
+		hero.MaxBlood = define.Blood
+		hero.MaxMP = define.MP
 		if len(define.SkillIds) > 0 {
 			hero.SkillIds = tool.SpliteInt32Arr(define.SkillIds, ",")
 		}
@@ -509,6 +542,8 @@ func (m *Module) LoadUserHero() {
 			heros = make([]*entry.Hero, 0)
 		}
 		hero := new(entry.Hero)
+		hero.PlayerId = define.Uid
+		hero.HeroId = define.HeroId
 		hero.Level = define.Level
 		hero.Exp = define.Exp
 		hero.LevelUpExp = define.LevelUpExp
@@ -523,6 +558,34 @@ func (m *Module) LoadUserHero() {
 		hero.Armor = define.Armor
 		hero.MaxBlood = define.Blood
 		hero.MaxMP = define.MP
+		hero.IsSelect = define.IsSelect
+		hero.Pos = define.Pos
+
+		var heroDefine HeroDefine
+		m.db.Where("hero_id = ?", define.HeroDefineId).First(&heroDefine)
+		hero.Name = heroDefine.Name
+		hero.Type = heroDefine.Type
+
+		hero.Skills = make([]*entry.Skill, 0)
+		var heroSkills []UserHeroSkill
+		m.db.Where("hero_id = ?", define.HeroId).First(&heroSkills)
+		for _, heroSkill := range heroSkills {
+			skill := new(entry.Skill)
+			skill.HeroId = heroSkill.HeroId
+			skill.SkillId = heroSkill.SkillId
+			skill.Id = heroSkill.SkillDefineId
+			skill.Level = heroSkill.Level
+			skill.IsOpen = heroSkill.IsOpen
+
+			var skillDefine SkillDefine
+			m.db.Where("skill_id = ?", heroSkill.SkillDefineId).First(&skillDefine)
+			skill.Name = skillDefine.Name
+			skill.Type = skillDefine.Type
+			skill.Desc = skillDefine.Desc
+
+			hero.Skills = append(hero.Skills, skill)
+		}
+
 		heros = append(heros, hero)
 		m.playerHeros[define.Uid] = heros
 	}
@@ -531,6 +594,87 @@ func (m *Module) LoadUserHero() {
 		cnt += len(heros)
 	}
 	log.Debug("load user hero  db %v  mem %v", len(userHeros), cnt)
+}
+
+func (m *Module) LoadUserChapter() {
+	var userChapters []UserChapter
+	m.db.Find(&userChapters)
+	for _, define := range userChapters {
+		chapter := new(entry.Chapter)
+		chapter.Id = define.ChapterDefineId
+		chapter.ChapterId = define.ChapterId
+		chapter.Star = define.Star
+		chapter.Status = define.Status
+		chapter.IsOpen = define.IsOpen
+
+		var chapterDefine ChapterDefine
+		m.db.Where("chapter_id = ?", define.ChapterDefineId).First(&chapterDefine)
+		chapter.Name = chapterDefine.Name
+		chapter.GuanKaNum = chapterDefine.GuanKaNum
+
+		chapters := m.playerChapters[define.Uid]
+		if chapters == nil {
+			chapters = make([]*entry.Chapter, 0)
+		}
+
+		chapters = append(chapters, chapter)
+
+		m.playerChapters[define.Uid] = chapters
+	}
+	cnt := 0
+	for _, chapters := range m.playerChapters {
+		cnt += len(chapters)
+	}
+
+	log.Debug("load user chapter  db %v  mem %v", len(userChapters), cnt)
+}
+
+func (m *Module) LoadUserGuanKa() {
+	var userGuanKas []UserGuanKa
+	m.db.Find(&userGuanKas)
+	for _, define := range userGuanKas {
+		gk := new(entry.GuanKa)
+		gk.Id = define.GuanKaDefineId
+		gk.GuanKaId = define.GuanKaId
+		gk.Star = define.Star
+		gk.Status = define.Status
+		gk.IsOpen = define.IsOpen
+		gk.Times = define.Times
+
+		var gkDefine GuanKaDefine
+		m.db.Where("guan_ka_id = ?", define.GuanKaDefineId).First(&gkDefine)
+		gk.Name = gkDefine.Name
+		gk.ChapterId = gkDefine.ChapterId
+		gk.TotalTimes = gkDefine.TotalTimes
+
+		var gkEarnDefine GuanKaEarnDefine
+		m.db.Where("guan_ka_id = ?", define.GuanKaDefineId).First(&gkEarnDefine)
+		gk.Earn = new(entry.Earn)
+		gk.Earn.ItemIds = tool.SpliteInt32Arr(gkEarnDefine.ItemIds, ",")
+		gk.Earn.HeroExp = gkEarnDefine.HeroExp
+		gk.Earn.PlayerExp = gkEarnDefine.PlayerExp
+		gk.Earn.Gold = gkEarnDefine.Gold
+
+		var gkExpendDefine GuanKaExpendDefine
+		m.db.Where("guan_ka_id = ?", define.GuanKaDefineId).First(&gkExpendDefine)
+		gk.Expend = new(entry.Expend)
+		gk.Expend.Power = gkExpendDefine.Power
+
+		gks := m.playerGuanKas[define.Uid]
+		if gks == nil {
+			gks = make([]*entry.GuanKa, 0)
+		}
+
+		gks = append(gks, gk)
+
+		m.playerGuanKas[define.Uid] = gks
+	}
+	cnt := 0
+	for _, gks := range m.playerGuanKas {
+		cnt += len(gks)
+	}
+
+	log.Debug("load user guanka  db %v  mem %v", len(userGuanKas), cnt)
 }
 
 func (m *Module) ExecutePersistent() {
@@ -547,7 +691,137 @@ func (m *Module) DoPersistent() {
 	log.Debug("DoPersistent =====>  start")
 	m.PersistentUser()
 	m.PersistentUserHero()
+	m.PersistentChapter()
+	m.PersistentGuanKa()
+	m.PersistentGroup()
+	m.PersistentGroupMember()
 	log.Debug("DoPersistent =====>  end")
+}
+
+func (m *Module) PersistentGroupMember() {
+	cnt := 0
+	for _, group := range m.groups {
+		if group.GroupMembers != nil {
+			for _, groupMember := range group.GroupMembers {
+				if groupMember.IsDirty {
+					gpm := GroupMember{
+						GroupId:     group.GroupId,
+						UserId:      groupMember.UserId,
+						ContriToday: groupMember.ContriToday,
+						ContriTotal: groupMember.ContriTotal,
+						Job:         groupMember.Job,
+					}
+
+					var oldGroupMember GroupMember
+					m.db.Where("user_id = ?", gpm.UserId).First(&oldGroupMember)
+					if gpm.UserId != oldGroupMember.UserId {
+						m.db.Create(&gpm)
+					} else {
+						m.db.Model(&gpm).Where("user_id = ?", gpm.GroupId).Updates(gpm)
+					}
+
+					cnt++
+					groupMember.IsDirty = false
+				}
+			}
+		}
+	}
+	log.Debug("persistent groupMember %v ", cnt)
+}
+
+func (m *Module) PersistentGroup() {
+	cnt := 0
+	for _, group := range m.groups {
+		if group.IsDirty {
+
+			gp := Group{
+				GroupId:          group.GroupId,
+				GroupName:        group.GroupName,
+				GroupLeader:      group.GroupName,
+				GroupDeclaration: group.GroupDeclaration,
+				MemberCnt:        group.MemberCnt,
+				MemberTotal:      group.MemberTotal,
+				GroupLevel:       group.GroupLevel,
+				ContriCurrent:    group.ContriCurrent,
+				ContriLevelUp:    group.ContriLevelUp,
+			}
+
+			var oldGroup Group
+			m.db.Where("group_id = ?", gp.GroupId).First(&oldGroup)
+			if gp.GroupId != oldGroup.GroupId {
+				m.db.Create(&gp)
+			} else {
+				m.db.Model(&gp).Where("group_id = ?", gp.GroupId).Updates(gp)
+			}
+
+			cnt++
+			group.IsDirty = false
+		}
+	}
+	log.Debug("persistent group %v ", cnt)
+}
+
+func (m *Module) PersistentGuanKa() {
+	cnt := 0
+	for uid, guanKas := range m.playerGuanKas {
+		for _, guanKa := range guanKas {
+			if guanKa.IsDirty {
+
+				userGuanKa := UserGuanKa{
+					Uid:            uid,
+					GuanKaId:       guanKa.GuanKaId,
+					GuanKaDefineId: guanKa.Id,
+					Star:           guanKa.Star,
+					Status:         guanKa.Status,
+					IsOpen:         guanKa.IsOpen,
+					Times:          guanKa.Times,
+				}
+
+				var oldUserGuanKa UserGuanKa
+				m.db.Where("guan_ka_id = ?", userGuanKa.GuanKaId).First(&oldUserGuanKa)
+				if userGuanKa.GuanKaId != oldUserGuanKa.GuanKaId {
+					m.db.Create(&userGuanKa)
+				} else {
+					m.db.Model(&userGuanKa).Where("guan_ka_id = ?", userGuanKa.GuanKaId).Updates(userGuanKa)
+				}
+
+				cnt++
+				guanKa.IsDirty = false
+			}
+		}
+	}
+	log.Debug("persistent user guanka %v ", cnt)
+}
+
+func (m *Module) PersistentChapter() {
+	cnt := 0
+	for uid, chapters := range m.playerChapters {
+		for _, chapter := range chapters {
+			if chapter.IsDirty {
+
+				userChapter := UserChapter{
+					Uid:             uid,
+					ChapterId:       chapter.ChapterId,
+					ChapterDefineId: chapter.Id,
+					Star:            chapter.Star,
+					Status:          chapter.Status,
+					IsOpen:          chapter.IsOpen,
+				}
+
+				var oldUserChapter UserChapter
+				m.db.Where("chapter_id = ?", userChapter.ChapterId).First(&oldUserChapter)
+				if userChapter.ChapterId != oldUserChapter.ChapterId {
+					m.db.Create(&userChapter)
+				} else {
+					m.db.Model(&userChapter).Where("chapter_id = ?", userChapter.ChapterId).Updates(userChapter)
+				}
+
+				cnt++
+				chapter.IsDirty = false
+			}
+		}
+	}
+	log.Debug("persistent user chapter %v ", cnt)
 }
 
 func (m *Module) PersistentUserHero() {
@@ -574,6 +848,8 @@ func (m *Module) PersistentUserHero() {
 					AttackMax:        hero.AttackMax,
 					Blood:            hero.MaxBlood,
 					MP:               hero.MaxMP,
+					IsSelect:         hero.IsSelect,
+					Pos:              hero.Pos,
 				}
 
 				var oldUserHero UserHero
@@ -581,7 +857,30 @@ func (m *Module) PersistentUserHero() {
 				if userHero.HeroId != oldUserHero.HeroId {
 					m.db.Create(&userHero)
 				} else {
-					m.db.Model(&userHero).Updates(userHero)
+					m.db.Model(&userHero).Where("hero_id = ?", userHero.HeroId).Updates(userHero)
+				}
+
+				for _, skill := range hero.Skills {
+					if skill.IsDirty {
+
+						heroSkill := UserHeroSkill{
+							HeroId:        skill.HeroId,
+							SkillId:       skill.SkillId,
+							SkillDefineId: skill.Id,
+							Level:         skill.Level,
+							IsOpen:        skill.IsOpen,
+						}
+
+						var oldHeroSkill UserHeroSkill
+						m.db.Where("skill_id = ?", heroSkill.SkillId).First(&oldHeroSkill)
+						if heroSkill.SkillId != oldHeroSkill.SkillId {
+							m.db.Create(&heroSkill)
+						} else {
+							m.db.Model(&heroSkill).Where("skill_id = ?", heroSkill.SkillId).Updates(heroSkill)
+						}
+
+						skill.IsDirty = false
+					}
 				}
 
 				cnt++
@@ -597,9 +896,11 @@ func (m *Module) PersistentUser() {
 	for _, player := range m.players {
 		if player.IsDirty {
 			user := User{
-				Uid:      player.UserId,
-				Account:  player.Account,
-				Password: player.Password,
+				Uid:        player.UserId,
+				Account:    player.Account,
+				Password:   player.Password,
+				LoginTime:  player.LoginTime,
+				LogoutTime: player.LogoutTime,
 			}
 
 			var oldUser User
@@ -607,9 +908,15 @@ func (m *Module) PersistentUser() {
 			if user.Uid != oldUser.Uid {
 				m.db.Create(&user)
 			} else {
-				m.db.Model(&user).Updates(user)
+				m.db.Model(&user).Where("uid = ?", user.Uid).Updates(user)
 			}
 
+			player.IsDirty = false
+
+			cnt++
+		}
+
+		if player.BaseInfo != nil && player.BaseInfo.IsDirty {
 			userBaseInfo := UserBaseInfo{
 				Uid:        player.UserId,
 				Name:       player.Name,
@@ -620,6 +927,7 @@ func (m *Module) PersistentUser() {
 				Diamond:    player.BaseInfo.Diamond,
 				Power:      player.BaseInfo.Power,
 				MaxPower:   player.BaseInfo.MaxPower,
+				Military:   player.BaseInfo.Military,
 			}
 
 			var oldUserInfo UserBaseInfo
@@ -627,9 +935,15 @@ func (m *Module) PersistentUser() {
 			if userBaseInfo.Uid != oldUserInfo.Uid {
 				m.db.Create(&userBaseInfo)
 			} else {
-				m.db.Model(&userBaseInfo).Updates(userBaseInfo)
+				m.db.Model(&userBaseInfo).Where("uid = ?", userBaseInfo.Uid).Updates(userBaseInfo)
 			}
 
+			player.BaseInfo.IsDirty = false
+
+			cnt++
+		}
+
+		if player.ExtendInfo != nil && player.ExtendInfo.IsDirty {
 			userTarvern := UserTarvern{
 				Uid:                        player.UserId,
 				FreeGoodLottery:            player.ExtendInfo.FreeGoodLottery,
@@ -649,12 +963,12 @@ func (m *Module) PersistentUser() {
 			if userTarvern.Uid != oldUserTarvern.Uid {
 				m.db.Create(&userTarvern)
 			} else {
-				m.db.Model(&userTarvern).Updates(userTarvern)
+				m.db.Model(&userTarvern).Where("uid = ?", userTarvern.Uid).Updates(userTarvern)
 			}
 
-			cnt++
+			player.ExtendInfo.IsDirty = false
 
-			player.IsDirty = false
+			cnt++
 		}
 	}
 	log.Debug("persistent user %v ", cnt)

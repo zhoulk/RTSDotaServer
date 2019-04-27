@@ -34,15 +34,16 @@ func (m *Module) AllChapters(player *entry.Player) []*entry.Chapter {
 	if player == nil || len(player.UserId) == 0 {
 		return nil
 	}
-	if m.playerChapters[player.UserId] == nil {
+	if m.playerChapters[player.UserId] == nil || len(m.playerChapters[player.UserId]) == 0 {
 		chapters := make([]*entry.Chapter, 0)
 		for i, ch := range m.chapters {
-			chapter := new(entry.Chapter)
+			chapter := entry.NewChapter()
 			tool.DeepCopy(chapter, ch)
-			chapter.Status = entry.ChapterStatusLock
+			chapter.SetChapterId(tool.UniqueId())
+			chapter.SetStatus(entry.ChapterStatusLock)
 			if i == 0 {
-				chapter.IsOpen = true
-				chapter.Status = entry.ChapterStatusNormal
+				chapter.SetOpen(true)
+				chapter.SetStatus(entry.ChapterStatusNormal)
 			}
 			chapters = append(chapters, chapter)
 		}
@@ -61,14 +62,15 @@ func (m *Module) AllGuanKas(player *entry.Player) []*entry.GuanKa {
 		guanKas := make([]*entry.GuanKa, 0)
 
 		for i, gk := range m.guanKas {
-			guanKa := new(entry.GuanKa)
+			guanKa := entry.NewGuanKa()
 			tool.DeepCopy(guanKa, gk)
-			guanKa.Status = entry.ChapterStatusLock
+			guanKa.SetGuanKaId(tool.UniqueId())
+			guanKa.SetStatus(entry.ChapterStatusLock)
 			if i == 0 {
-				guanKa.IsOpen = true
-				guanKa.Status = entry.ChapterStatusNormal
+				guanKa.SetOpen(true)
+				guanKa.SetStatus(entry.ChapterStatusNormal)
 			}
-			guanKa.Times = guanKa.TotalTimes
+			guanKa.SetTimes(guanKa.TotalTimes)
 			guanKas = append(guanKas, guanKa)
 		}
 		m.playerGuanKas[player.UserId] = guanKas
@@ -167,10 +169,10 @@ func (m *Module) UpdateGuanKa(player *entry.Player, gk *entry.GuanKa, result int
 }
 
 func (m *Module) updateGuanKa(player *entry.Player, gk *entry.GuanKa, star int32) {
-	gk.Star = star
-	gk.Status = entry.ChapterStatusCleared
+	gk.SetStar(star)
+	gk.SetStatus(entry.ChapterStatusCleared)
 	chapter := m.FindChapter(player, gk.ChapterId)
-	chapter.Status = entry.ChapterStatusCleared
+	chapter.SetStatus(entry.ChapterStatusCleared)
 	m.calChapterStar(player, chapter)
 	m.openNextGuanKa(player, gk)
 }
@@ -178,10 +180,10 @@ func (m *Module) updateGuanKa(player *entry.Player, gk *entry.GuanKa, star int32
 func (m *Module) openNextGuanKa(player *entry.Player, gk *entry.GuanKa) {
 	nextGk := m.FindNextGuanKa(player, gk.Id)
 	if nextGk != nil {
-		nextGk.IsOpen = true
-		nextGk.Status = entry.ChapterStatusNormal
+		nextGk.SetOpen(true)
+		nextGk.SetStatus(entry.ChapterStatusNormal)
 		chapter := m.FindChapter(player, nextGk.ChapterId)
-		chapter.Status = entry.ChapterStatusNormal
+		chapter.SetStatus(entry.ChapterStatusNormal)
 	}
 }
 
@@ -192,5 +194,5 @@ func (m *Module) calChapterStar(player *entry.Player, chapter *entry.Chapter) {
 	for _, gk := range gks {
 		stars += gk.Star
 	}
-	chapter.Star = stars
+	chapter.SetStar(stars)
 }

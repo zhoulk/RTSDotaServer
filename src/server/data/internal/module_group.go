@@ -30,27 +30,27 @@ func (m *Module) CreateGroup(player *entry.Player, name string) *entry.Group {
 		return nil
 	}
 
-	group := new(entry.Group)
-	group.GroupId = tool.UniqueId()
-	group.GroupName = name
-	group.GroupLeader = player.Name
-	group.MemberCnt = 1
-	group.MemberTotal = 30
-	group.GroupLevel = 1
-	group.ContriCurrent = 0
-	group.ContriLevelUp = 5000
+	group := entry.NewGroup()
+	group.SetGroupId(tool.UniqueId())
+	group.SetGroupName(name)
+	group.SetGroupLeader(player.Name)
+	group.SetMemberCnt(1)
+	group.SetMemberTotal(30)
+	group.SetGroupLevel(1)
+	group.SetContriCurrent(0)
+	group.SetContriLevelUp(5000)
 	group.GroupMembers = make([]*entry.GroupMember, 0)
 
-	member := new(entry.GroupMember)
-	member.UserId = player.UserId
-	member.Level = player.BaseInfo.Level
-	member.Name = player.Name
+	member := entry.NewGroupMember()
+	member.SetUserId(player.UserId)
+	member.SetLevel(player.BaseInfo.Level)
+	member.SetName(player.Name)
 	group.GroupMembers = append(group.GroupMembers, member)
 
 	if player.ExtendInfo == nil {
-		player.ExtendInfo = new(entry.ExtendInfo)
+		player.ExtendInfo = entry.NewExtendInfo()
 	}
-	player.ExtendInfo.GroupId = group.GroupId
+	player.ExtendInfo.SetGroupId(group.GroupId)
 
 	m.groups = append(m.groups, group)
 

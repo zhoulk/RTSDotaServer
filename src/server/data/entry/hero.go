@@ -55,7 +55,7 @@ type Hero struct {
 
 func NewHero() *Hero {
 	hero := new(Hero)
-
+	hero.IsDirty = true
 	return hero
 }
 
@@ -132,6 +132,20 @@ func (h *Hero) SetLevelUpExp(levelUpExp int32) {
 func (h *Hero) SetSkillPoint(skillPoint int32) {
 	h.SkillPoint = skillPoint
 	h.IsDirty = true
+}
+
+func (h *Hero) SetSelect(sel bool) {
+	h.IsSelect = sel
+	h.IsDirty = true
+}
+
+func (h *Hero) SetPos(pos int32) {
+	h.Pos = pos
+	h.IsDirty = true
+}
+
+func (h *Hero) SetSkills(skills []*Skill) {
+	h.Skills = skills
 }
 
 const (

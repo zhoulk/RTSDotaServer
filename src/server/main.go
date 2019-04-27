@@ -52,6 +52,20 @@ func main() {
 	// arr := tool.C_M_N(8, 3)
 	// log.Debug("%v", arr)
 
+	// a := make([]int32, 0)
+	// b := a
+
+	// a = append(a, 100)
+
+	// log.Debug("%v  %v", len(a), len(b))
+
+	// c := new(entry.Hero)
+	// d := c
+
+	// c.HeroId = "aaaaa"
+
+	// log.Debug("%v  %v", c.HeroId, d.HeroId)
+
 	leaf.Run(
 		gate.Module,
 		game.Module,

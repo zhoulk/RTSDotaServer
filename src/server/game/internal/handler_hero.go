@@ -137,6 +137,7 @@ func handleRandomHero(args []interface{}) {
 			hero.SetMaxBlood(hero.Blood)
 			hero.SetMaxMP(hero.MP)
 
+			data.Module.InitHeroSkills(hero)
 			data.Module.SavePlayerHero(player, hero)
 
 			if player.ExtendInfo.FreeGoodLottery > 0 {

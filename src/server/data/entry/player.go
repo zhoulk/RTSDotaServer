@@ -7,10 +7,12 @@ import (
 )
 
 type Player struct {
-	UserId   string
-	Account  string
-	Password string
-	Name     string
+	UserId     string
+	Account    string
+	Password   string
+	Name       string
+	LoginTime  time.Time
+	LogoutTime time.Time
 
 	BaseInfo   *BaseInfo
 	ExtendInfo *ExtendInfo
@@ -38,13 +40,13 @@ func (p *Player) SetName(name string) {
 	p.IsDirty = true
 }
 
-func (p *Player) SetBaseInfo(baseInfo *BaseInfo) {
-	p.BaseInfo = baseInfo
+func (p *Player) SetLoginTime(loginTime time.Time) {
+	p.LoginTime = loginTime
 	p.IsDirty = true
 }
 
-func (p *Player) SetExtendInfo(extendInfo *ExtendInfo) {
-	p.ExtendInfo = extendInfo
+func (p *Player) SetLogoutTime(logoutTime time.Time) {
+	p.LogoutTime = logoutTime
 	p.IsDirty = true
 }
 
@@ -56,6 +58,14 @@ type BaseInfo struct {
 	Power      int32
 	MaxPower   int32
 	Level      int32
+	Military   int32
+
+	IsDirty bool
+}
+
+func (b *BaseInfo) SetPower(power int32) {
+	b.Power = power
+	b.IsDirty = true
 }
 
 type ExtendInfo struct {
@@ -74,23 +84,29 @@ type ExtendInfo struct {
 	BetterLotteryCnt           int32
 	NeedGoodLotteryCnt         int32
 	NeedBetterLotteryCnt       int32
+
+	IsDirty bool
 }
 
 func NewPlayer() *Player {
 	player := new(Player)
 	player.UserId = tool.UniqueId()
+	player.IsDirty = true
 	return player
 }
 
 func NewBaseInfo() *BaseInfo {
 	baseInfo := new(BaseInfo)
 	baseInfo.Gold = 10000
-	baseInfo.Diamond = 0
+	baseInfo.Diamond = 5000
 	baseInfo.Level = 1
 	baseInfo.Power = define.PLAYER_MAX_MP
 	baseInfo.MaxPower = define.PLAYER_MAX_MP
 	baseInfo.Exp = 0
 	baseInfo.LevelUpExp = 90
+
+	baseInfo.IsDirty = true
+
 	return baseInfo
 }
 
@@ -106,5 +122,12 @@ func NewExtendInfo() *ExtendInfo {
 	extendInfo.BetterLotteryCnt = 0
 	extendInfo.NeedGoodLotteryCnt = 10
 	extendInfo.NeedBetterLotteryCnt = 10
+
+	extendInfo.IsDirty = true
+
 	return extendInfo
+}
+
+func (e *ExtendInfo) SetGroupId(groupId string) {
+	e.GroupId = groupId
 }

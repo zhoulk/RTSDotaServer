@@ -22,6 +22,24 @@ type Skill struct {
 	SkillId   string
 
 	act SkillAct
+
+	IsDirty bool
+}
+
+func NewSkill() *Skill {
+	skill := new(Skill)
+	skill.IsDirty = true
+	return skill
+}
+
+func (s *Skill) SetHeroId(heroId string) {
+	s.HeroId = heroId
+	s.IsDirty = true
+}
+
+func (s *Skill) SetSkillId(skillId string) {
+	s.SkillId = skillId
+	s.IsDirty = true
 }
 
 func (h *Skill) String() string {

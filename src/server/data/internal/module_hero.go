@@ -55,24 +55,28 @@ func (m *Module) FindAHeroAt(player *entry.Player, pos int32) *entry.Hero {
 	return nil
 }
 
-func (m *Module) FindHeroSkills(hero *entry.Hero) []*entry.Skill {
-	if hero.Skills == nil {
-		skills := make([]*entry.Skill, 0)
-		if hero.SkillIds != nil {
-			for _, skillId := range hero.SkillIds {
-				skill := m.FindASkill(skillId)
-				if skill != nil {
-					sk := new(entry.Skill)
-					tool.DeepCopy(sk, skill)
-					sk.HeroId = hero.HeroId
-					sk.SkillId = tool.UniqueId()
-					skills = append(skills, sk)
-				} else {
-					log.Error("[FindHeroSkills ] skill is not exist , skillId = %v", skillId)
-				}
+func (m *Module) InitHeroSkills(hero *entry.Hero) {
+	skills := make([]*entry.Skill, 0)
+	if hero.SkillIds != nil {
+		for _, skillId := range hero.SkillIds {
+			skill := m.FindASkill(skillId)
+			if skill != nil {
+				sk := entry.NewSkill()
+				tool.DeepCopy(sk, skill)
+				sk.SetHeroId(hero.HeroId)
+				sk.SetSkillId(tool.UniqueId())
+				skills = append(skills, sk)
+			} else {
+				log.Error("[InitHeroSkills ] skill is not exist , skillId = %v", skillId)
 			}
 		}
-		hero.Skills = skills
+	}
+	hero.SetSkills(skills)
+}
+
+func (m *Module) FindHeroSkills(hero *entry.Hero) []*entry.Skill {
+	if hero.Skills == nil {
+		m.InitHeroSkills(hero)
 	}
 	return hero.Skills
 }
@@ -94,13 +98,13 @@ func (m *Module) RemoveHero(player *entry.Player, heroId string) *entry.Hero {
 }
 
 func (m *Module) UnSelectHero(player *entry.Player, hero *entry.Hero) {
-	hero.IsSelect = false
-	hero.Pos = 0
+	hero.SetSelect(false)
+	hero.SetPos(0)
 }
 
 func (m *Module) SelectHero(player *entry.Player, hero *entry.Hero, pos int32) {
-	hero.IsSelect = true
-	hero.Pos = pos
+	hero.SetSelect(true)
+	hero.SetPos(pos)
 }
 
 func (m *Module) SelectHeroIds(player *entry.Player) []string {

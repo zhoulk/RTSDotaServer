@@ -48,11 +48,8 @@ func (m *Module) OnInit() {
 	m.zones = make([]*entry.Zone, 0)
 	m.playerExpList = make([]int32, 0)
 	m.heroExpList = make([]int32, 0)
-	//m.heros = InitHeros()
-	//m.skills = InitSkills()
-	//m.items = InitItems()
-	//m.chapters = InitChapters()
-	//m.guanKas = InitGuanKas()
+	m.groups = make([]*entry.Group, 0)
+
 	m.battleCache = make(map[string]*entry.BattleInfo)
 
 	m.PersistentData()
@@ -74,5 +71,5 @@ func (m *Module) EffectByEarn(player *entry.Player, earn *entry.Earn) {
 }
 
 func (m *Module) EffectByExpend(player *entry.Player, expend *entry.Expend) {
-	player.BaseInfo.Power -= expend.Power
+	player.BaseInfo.SetPower(player.BaseInfo.Power - expend.Power)
 }
