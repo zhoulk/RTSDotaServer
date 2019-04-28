@@ -268,21 +268,21 @@ func (m *Module) IntializeItemTable() {
 			ItemId: item.Id,
 			Name:   item.Name,
 			Price:  item.Price,
-			Effect: item.Effect,
-			Desc:   item.Desc,
+			// Effect: item.Effect,
+			// Desc:   item.Desc,
 		}
 		m.db.Where("item_id = ?", itemDefine.ItemId).FirstOrCreate(&itemDefine)
 
-		if item.Mixs != nil {
-			for _, mix := range item.Mixs {
-				mixDefine := ItemMixDefine{
-					ItemId:  item.Id,
-					ChildId: mix.ItemId,
-					Num:     mix.Num,
-				}
-				m.db.Where("item_id = ? and child_id = ?", mixDefine.ItemId, mixDefine.ChildId).FirstOrCreate(&mixDefine)
-			}
-		}
+		// if item.Mixs != nil {
+		// 	for _, mix := range item.Mixs {
+		// 		mixDefine := ItemMixDefine{
+		// 			ItemId:  item.Id,
+		// 			ChildId: mix.ItemId,
+		// 			Num:     mix.Num,
+		// 		}
+		// 		m.db.Where("item_id = ? and child_id = ?", mixDefine.ItemId, mixDefine.ChildId).FirstOrCreate(&mixDefine)
+		// 	}
+		// }
 	}
 }
 
@@ -498,17 +498,17 @@ func (m *Module) LoadItem() {
 		item.Id = define.ItemId
 		item.Name = define.Name
 		item.Price = define.Price
-		item.Effect = define.Effect
+		// item.Effect = define.Effect
 		item.Desc = define.Desc
 
 		var mixDefines []*ItemMixDefine
 		m.db.Where("item_id = ?", define.ItemId).Find(&mixDefines)
-		item.Mixs = make([]*entry.Mix, 0)
+		// item.Mixs = make([]*entry.Mix, 0)
 		for _, m := range mixDefines {
 			mix := new(entry.Mix)
 			mix.ItemId = m.ChildId
 			mix.Num = m.Num
-			item.Mixs = append(item.Mixs, mix)
+			// item.Mixs = append(item.Mixs, mix)
 		}
 
 		m.items = append(m.items, item)

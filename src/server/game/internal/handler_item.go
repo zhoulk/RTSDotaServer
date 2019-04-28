@@ -36,14 +36,14 @@ func ConverItemToMsgItem(v *entry.Item) *msg.Item {
 	item.Id = v.Id
 	item.Name = v.Name
 	item.Price = v.Price
-	item.Effect = v.Effect
+	// item.Effect = v.Effect
 	item.Desc = v.Desc
-	item.Mixs = make([]*msg.Mix, 0)
-	if v.Mixs != nil {
-		for _, mix := range v.Mixs {
-			item.Mixs = append(item.Mixs, ConverMixToMsgMix(mix))
-		}
-	}
+	// item.Mixs = make([]*msg.Mix, 0)
+	// if v.Mixs != nil {
+	// 	for _, mix := range v.Mixs {
+	// 		item.Mixs = append(item.Mixs, ConverMixToMsgMix(mix))
+	// 	}
+	// }
 	item.ItemId = v.ItemId
 	item.HeroId = v.HeroId
 	return item
