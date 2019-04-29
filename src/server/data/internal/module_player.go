@@ -5,6 +5,14 @@ import (
 	"server/data/entry"
 )
 
+func (m *Module) CalPlayerPower() {
+	for _, player := range m.players {
+		if player.BaseInfo.Power < player.BaseInfo.MaxPower {
+			player.BaseInfo.SetPower(player.BaseInfo.Power + 1)
+		}
+	}
+}
+
 func (m *Module) AllZones() []*entry.Zone {
 	return m.zones
 }
@@ -15,6 +23,10 @@ func (m *Module) AllExpHeros() []int32 {
 
 func (m *Module) AllExpPlayers() []int32 {
 	return m.playerExpList
+}
+
+func (m *Module) AllPlayers() map[string]*entry.Player {
+	return m.players
 }
 
 func (m *Module) FindPlayer(account string, pwd string) *entry.Player {

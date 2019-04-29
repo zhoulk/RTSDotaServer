@@ -42,6 +42,16 @@ type HeroChip struct {
 	ComposeCnt int32
 }
 
+func NewItem() *Item {
+	item := new(Item)
+	item.IsDirty = true
+	return item
+}
+func (m *Item) SetItemId(itemId string) {
+	m.ItemId = itemId
+	m.IsDirty = true
+}
+
 func (item *Item) String() string {
 	return fmt.Sprintf("\n{Id : %d, Name : %s, Price : %d, Effect : %s, Desc : %s, Mixs : %v}",
 		item.Id, item.Name, item.Price, "", "", "")

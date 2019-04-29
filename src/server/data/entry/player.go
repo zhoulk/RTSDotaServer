@@ -2,8 +2,11 @@ package entry
 
 import (
 	"server/define"
+	"server/msg"
 	"server/tool"
 	"time"
+
+	"github.com/name5566/leaf/gate"
 )
 
 type Player struct {
@@ -18,6 +21,8 @@ type Player struct {
 	ExtendInfo *ExtendInfo
 
 	IsDirty bool
+
+	Agent gate.Agent
 }
 
 func (p *Player) SetUserId(userId string) {
@@ -130,4 +135,26 @@ func NewExtendInfo() *ExtendInfo {
 
 func (e *ExtendInfo) SetGroupId(groupId string) {
 	e.GroupId = groupId
+}
+
+func ConverPlayerToMsgPlayer(v *Player) *msg.Player {
+	player := new(msg.Player)
+	player.UserId = v.UserId
+	player.Name = v.Name
+	if v.BaseInfo != nil {
+		player.BaseInfo = ConverBaseInfoToMsgBaseInfo(v.BaseInfo)
+	}
+	return player
+}
+
+func ConverBaseInfoToMsgBaseInfo(v *BaseInfo) *msg.BaseInfo {
+	baseInfo := new(msg.BaseInfo)
+	baseInfo.Level = v.Level
+	baseInfo.Gold = v.Gold
+	baseInfo.Diamond = v.Diamond
+	baseInfo.Exp = v.Exp
+	baseInfo.Power = v.Power
+	baseInfo.LevelUpExp = v.LevelUpExp
+	baseInfo.MaxPower = v.MaxPower
+	return baseInfo
 }

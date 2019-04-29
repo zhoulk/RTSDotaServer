@@ -159,13 +159,21 @@ func handleGuanKaBattle(result int32, gk *entry.GuanKa) *entry.Earn {
 		earn.HeroExp = gk.Earn.HeroExp
 		earn.PlayerExp = gk.Earn.PlayerExp
 		earn.ItemIds = make([]int32, 0)
+		earn.Items = make([]*entry.Item, 0)
 
 		itemCnt := len(gk.Earn.ItemIds)
 
 		indexArr := tool.C_M_N(int32(itemCnt), 1)
 
 		for _, index := range indexArr {
-			earn.ItemIds = append(earn.ItemIds, gk.Earn.ItemIds[index])
+			itemId := gk.Earn.ItemIds[index]
+			itemDefine := data.Module.FindItem(itemId)
+			earn.ItemIds = append(earn.ItemIds, itemId)
+
+			item := entry.NewItem()
+			tool.DeepCopy(item, itemDefine)
+			item.SetItemId(tool.UniqueId())
+			earn.Items = append(earn.Items, item)
 		}
 
 		break

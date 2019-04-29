@@ -61,7 +61,7 @@ func handleRegiste(args []interface{}) {
 
 	response := new(msg.RegisteResponse)
 	response.Code = msg.ResponseCode_SUCCESS
-	response.Player = ConverPlayerToMsgPlayer(player)
+	response.Player = entry.ConverPlayerToMsgPlayer(player)
 	a.WriteMsg(response)
 }
 
@@ -86,8 +86,9 @@ func handleAuth(args []interface{}) {
 	log.Debug("user exist ", player.UserId, player.Name)
 
 	response.Code = msg.ResponseCode_SUCCESS
-	response.Player = ConverPlayerToMsgPlayer(player)
+	response.Player = entry.ConverPlayerToMsgPlayer(player)
 
+	player.Agent = a
 	a.SetUserData(player)
 	a.WriteMsg(response)
 }
@@ -102,40 +103,10 @@ func handleAllZone(args []interface{}) {
 	response.Code = msg.ResponseCode_SUCCESS
 	response.Zones = make([]*msg.Zone, 0)
 	for _, z := range data.Module.AllZones() {
-		response.Zones = append(response.Zones, ConverZoneToMsgZone(z))
+		response.Zones = append(response.Zones, entry.ConverZoneToMsgZone(z))
 	}
 
 	a.WriteMsg(response)
-}
-
-func ConverPlayerToMsgPlayer(v *entry.Player) *msg.Player {
-	player := new(msg.Player)
-	player.UserId = v.UserId
-	player.Name = v.Name
-	if v.BaseInfo != nil {
-		player.BaseInfo = ConverBaseInfoToMsgBaseInfo(v.BaseInfo)
-	}
-	return player
-}
-
-func ConverBaseInfoToMsgBaseInfo(v *entry.BaseInfo) *msg.BaseInfo {
-	baseInfo := new(msg.BaseInfo)
-	baseInfo.Level = v.Level
-	baseInfo.Gold = v.Gold
-	baseInfo.Diamond = v.Diamond
-	baseInfo.Exp = v.Exp
-	baseInfo.Power = v.Power
-	baseInfo.LevelUpExp = v.LevelUpExp
-	baseInfo.MaxPower = v.MaxPower
-	return baseInfo
-}
-
-func ConverZoneToMsgZone(v *entry.Zone) *msg.Zone {
-	zone := new(msg.Zone)
-	zone.Id = v.Id
-	zone.Name = v.Name
-	zone.IsNew = v.IsNew
-	return zone
 }
 
 func NewErr(errCode int32) *msg.Error {

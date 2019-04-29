@@ -35,6 +35,8 @@ func init() {
 	handler(&msg.GroupListRequest{}, handleGroupList)
 	handler(&msg.GroupCreateRequest{}, handleGroupCreate)
 	handler(&msg.GroupMembersRequest{}, handleGroupMembers)
+
+	handleCrontab()
 }
 
 func handler(m interface{}, h interface{}) {

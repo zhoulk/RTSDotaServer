@@ -16,6 +16,15 @@ func (m *Module) HasItem(id int32) bool {
 	return exist
 }
 
+func (m *Module) FindItem(id int32) *entry.Item {
+	for _, define := range m.items {
+		if define.Id == id {
+			return define
+		}
+	}
+	return nil
+}
+
 func (m *Module) AllItems() []*entry.Item {
 	return m.items
 }

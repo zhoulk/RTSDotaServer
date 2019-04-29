@@ -62,4 +62,5 @@ func init() {
 
 	Processor.Register(1000, &ChapterUpdateNotify{})
 	Processor.Register(1001, &GuanKaUpdateNotify{})
+	Processor.Register(1002, &PlayerInfoNotify{})
 }

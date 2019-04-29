@@ -3,7 +3,6 @@ package internal
 import (
 	"server/data/entry"
 	"server/tool"
-	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/name5566/leaf/log"
@@ -25,8 +24,6 @@ func (m *Module) PersistentData() {
 	m.IntializeTables()
 
 	m.LoadFromDB()
-
-	go m.ExecutePersistent()
 }
 
 func (m *Module) ConnectDB() {
@@ -346,6 +343,7 @@ func (m *Module) LoadFromDB() {
 	m.LoadUserHero()
 	m.LoadUserChapter()
 	m.LoadUserGuanKa()
+	m.LoadUserEquip()
 	log.Debug("loading data from db end ...")
 }
 
@@ -712,14 +710,55 @@ func (m *Module) LoadUserGuanKa() {
 	log.Debug("load user guanka  db %v  mem %v", len(userGuanKas), cnt)
 }
 
-func (m *Module) ExecutePersistent() {
-	timer := time.NewTicker(10 * time.Second)
-	for {
-		select {
-		case <-timer.C:
-			m.DoPersistent()
+func (m *Module) LoadUserEquip() {
+	var userEquips []UserEquip
+	m.db.Find(&userEquips)
+	for _, define := range userEquips {
+
+		items := m.playerItems[define.Uid]
+		if items == nil {
+			items = make([]*entry.Item, 0)
+		}
+
+		item := new(entry.Item)
+		item.Type = entry.ItemTypeEquip
+		item.Id = define.ItemDefineId
+		item.ItemId = define.EquipId
+		item.Equip = new(entry.Equip)
+
+		var equipDefine EquipDefine
+		m.db.Where("item_id = ?", define.ItemDefineId).First(&equipDefine)
+		item.Name = equipDefine.Name
+		item.Price = equipDefine.Price
+		item.Desc = equipDefine.Desc
+		item.Equip.Effect = equipDefine.Effect
+		item.Equip.HeroId = define.HeroId
+
+		item.Equip.Mixs = make([]*entry.Mix, 0)
+
+		var mixDefines []*EquipMixDefine
+		m.db.Where("item_id = ?", equipDefine.ItemId).Find(&mixDefines)
+		for _, m := range mixDefines {
+			mix := new(entry.Mix)
+			mix.ItemId = m.ChildId
+			mix.Num = m.Num
+			item.Equip.Mixs = append(item.Equip.Mixs, mix)
+		}
+
+		items = append(items, item)
+
+		m.playerItems[define.Uid] = items
+	}
+	cnt := 0
+	for _, items := range m.playerItems {
+		for _, item := range items {
+			if entry.ItemTypeEquip == item.Type {
+				cnt++
+			}
 		}
 	}
+
+	log.Debug("load user equip  db %v  mem %v", len(userEquips), cnt)
 }
 
 func (m *Module) DoPersistent() {
@@ -763,7 +802,7 @@ func (m *Module) PersistentItems() {
 		}
 	}
 
-	log.Debug("persistent groupMember %v ", cnt)
+	log.Debug("persistent user equip %v ", cnt)
 }
 
 func (m *Module) PersistentGroupMember() {

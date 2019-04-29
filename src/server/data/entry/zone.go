@@ -3,6 +3,7 @@ package entry
 import (
 	"encoding/json"
 	"io/ioutil"
+	"server/msg"
 
 	"github.com/go-simplejson"
 	"github.com/name5566/leaf/log"
@@ -50,4 +51,12 @@ func init() {
 
 	// Server.MaxConnNum = 20000
 	// Server.TCPAddr = ServerMap["Gate"][0].host + ":" + ServerMap["Gate"][0].port
+}
+
+func ConverZoneToMsgZone(v *Zone) *msg.Zone {
+	zone := new(msg.Zone)
+	zone.Id = v.Id
+	zone.Name = v.Name
+	zone.IsNew = v.IsNew
+	return zone
 }
