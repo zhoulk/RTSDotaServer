@@ -133,7 +133,7 @@ type GuanKaHeroDefine struct {
 	gorm.Model
 }
 
-type ItemDefine struct {
+type EquipDefine struct {
 	ItemId int32  `gorm:"unique;not null"`
 	Name   string `gorm:"size:16"`
 	Price  int32
@@ -143,10 +143,29 @@ type ItemDefine struct {
 	gorm.Model
 }
 
-type ItemMixDefine struct {
+type EquipMixDefine struct {
 	ItemId  int32
 	ChildId int32
 	Num     int32
+
+	gorm.Model
+}
+
+type ConsumeDefine struct {
+	ItemId int32  `gorm:"unique;not null"`
+	Name   string `gorm:"size:16"`
+	Price  int32
+	Desc   string `gorm:"size:256"`
+
+	gorm.Model
+}
+
+type HeroChipDefine struct {
+	ItemId     int32  `gorm:"unique;not null"`
+	Name       string `gorm:"size:16"`
+	Price      int32
+	ComposeCnt int32
+	Desc       string `gorm:"size:256"`
 
 	gorm.Model
 }
@@ -242,6 +261,32 @@ type GroupMember struct {
 	ContriToday int32
 	ContriTotal int32
 	Job         int32
+
+	gorm.Model
+}
+
+type UserEquip struct {
+	Uid          string `gorm:"size:64;not null"`
+	EquipId      string `gorm:"size:64;unique;not null"`
+	ItemDefineId int32  `gorm:"not null"`
+	HeroId       string `gorm:"size:64"`
+
+	gorm.Model
+}
+
+type UserConsume struct {
+	Uid          string `gorm:"size:64;not null"`
+	ConsumeId    string `gorm:"size:64;unique;not null"`
+	ItemDefineId int32  `gorm:"not null"`
+
+	gorm.Model
+}
+
+type UserHeroChip struct {
+	Uid          string `gorm:"size:64;not null"`
+	ChipId       string `gorm:"size:64;unique;not null"`
+	ItemDefineId int32  `gorm:"not null"`
+	Cnt          int32
 
 	gorm.Model
 }

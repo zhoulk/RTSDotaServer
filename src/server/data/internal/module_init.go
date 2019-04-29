@@ -58,10 +58,10 @@ func InitSkills() []*entry.Skill {
 	return skills
 }
 
-func InitItems() []*entry.Item {
+func InitEquips() []*entry.Item {
 	items := make([]*entry.Item, 0)
 
-	m, _ := ReadFile("data/json/item.json")
+	m, _ := ReadFile("data/json/equip.json")
 
 	for _, v := range m {
 		var item entry.Item

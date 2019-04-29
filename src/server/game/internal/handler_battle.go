@@ -248,7 +248,7 @@ func handleBattleStart(args []interface{}) {
 
 	response.Heros = make([]*msg.Hero, 0)
 	response.Skills = make([]*msg.Skill, 0)
-	response.Items = make([]*msg.Item, 0)
+	response.Equips = make([]*msg.Equip, 0)
 	selectHeros := data.Module.AllHeros()
 	// selectSkills := data.Module.AllSkills()
 	// selectItems := data.Module.AllItems()

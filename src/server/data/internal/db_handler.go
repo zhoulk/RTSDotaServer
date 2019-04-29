@@ -90,13 +90,23 @@ func (m *Module) CreateTables() {
 			panic(err)
 		}
 	}
-	if !m.db.HasTable(&ItemDefine{}) {
-		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&ItemDefine{}).Error; err != nil {
+	if !m.db.HasTable(&EquipDefine{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&EquipDefine{}).Error; err != nil {
 			panic(err)
 		}
 	}
-	if !m.db.HasTable(&ItemMixDefine{}) {
-		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&ItemMixDefine{}).Error; err != nil {
+	if !m.db.HasTable(&EquipMixDefine{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&EquipMixDefine{}).Error; err != nil {
+			panic(err)
+		}
+	}
+	if !m.db.HasTable(&ConsumeDefine{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&ConsumeDefine{}).Error; err != nil {
+			panic(err)
+		}
+	}
+	if !m.db.HasTable(&HeroChipDefine{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&HeroChipDefine{}).Error; err != nil {
 			panic(err)
 		}
 	}
@@ -145,6 +155,21 @@ func (m *Module) CreateTables() {
 			panic(err)
 		}
 	}
+	if !m.db.HasTable(&UserEquip{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&UserEquip{}).Error; err != nil {
+			panic(err)
+		}
+	}
+	if !m.db.HasTable(&UserConsume{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&UserConsume{}).Error; err != nil {
+			panic(err)
+		}
+	}
+	if !m.db.HasTable(&UserHeroChip{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&UserHeroChip{}).Error; err != nil {
+			panic(err)
+		}
+	}
 }
 
 func (m *Module) IntializeTables() {
@@ -153,7 +178,7 @@ func (m *Module) IntializeTables() {
 	m.IntializeSkillTable()
 	m.IntializeChapterTable()
 	m.IntializeGuanKaTable()
-	m.IntializeItemTable()
+	m.IntializeEquipTable()
 	m.IntializeExpPlayerTable()
 	m.IntializeExpHeroTable()
 }
@@ -261,28 +286,28 @@ func (m *Module) IntializeGuanKaTable() {
 	}
 }
 
-func (m *Module) IntializeItemTable() {
-	items := InitItems()
-	for _, item := range items {
-		itemDefine := ItemDefine{
-			ItemId: item.Id,
-			Name:   item.Name,
-			Price:  item.Price,
-			// Effect: item.Effect,
-			// Desc:   item.Desc,
+func (m *Module) IntializeEquipTable() {
+	equips := InitEquips()
+	for _, equip := range equips {
+		equipDefine := EquipDefine{
+			ItemId: equip.Id,
+			Name:   equip.Name,
+			Price:  equip.Price,
+			Effect: equip.Equip.Effect,
+			Desc:   equip.Desc,
 		}
-		m.db.Where("item_id = ?", itemDefine.ItemId).FirstOrCreate(&itemDefine)
+		m.db.Where("item_id = ?", equipDefine.ItemId).FirstOrCreate(&equipDefine)
 
-		// if item.Mixs != nil {
-		// 	for _, mix := range item.Mixs {
-		// 		mixDefine := ItemMixDefine{
-		// 			ItemId:  item.Id,
-		// 			ChildId: mix.ItemId,
-		// 			Num:     mix.Num,
-		// 		}
-		// 		m.db.Where("item_id = ? and child_id = ?", mixDefine.ItemId, mixDefine.ChildId).FirstOrCreate(&mixDefine)
-		// 	}
-		// }
+		if equip.Equip.Mixs != nil {
+			for _, mix := range equip.Equip.Mixs {
+				mixDefine := EquipMixDefine{
+					ItemId:  equip.Id,
+					ChildId: mix.ItemId,
+					Num:     mix.Num,
+				}
+				m.db.Where("item_id = ? and child_id = ?", mixDefine.ItemId, mixDefine.ChildId).FirstOrCreate(&mixDefine)
+			}
+		}
 	}
 }
 
@@ -316,7 +341,7 @@ func (m *Module) LoadFromDB() {
 	m.LoadSkill()
 	m.LoadChapter()
 	m.LoadGuanKa()
-	m.LoadItem()
+	m.LoadEquip()
 	m.LoadExp()
 	m.LoadUserHero()
 	m.LoadUserChapter()
@@ -490,31 +515,41 @@ func (m *Module) LoadGuanKa() {
 	log.Debug("load guankas  db %v  mem %v", len(gkDefines), len(m.guanKas))
 }
 
-func (m *Module) LoadItem() {
-	var itemDefines []*ItemDefine
-	m.db.Find(&itemDefines)
-	for _, define := range itemDefines {
+func (m *Module) LoadEquip() {
+	var equipDefines []*EquipDefine
+	m.db.Find(&equipDefines)
+	for _, define := range equipDefines {
 		item := new(entry.Item)
 		item.Id = define.ItemId
+		item.Type = entry.ItemTypeEquip
 		item.Name = define.Name
 		item.Price = define.Price
-		// item.Effect = define.Effect
 		item.Desc = define.Desc
 
-		var mixDefines []*ItemMixDefine
+		item.Equip = new(entry.Equip)
+		item.Equip.Effect = define.Effect
+		item.Equip.Mixs = make([]*entry.Mix, 0)
+
+		var mixDefines []*EquipMixDefine
 		m.db.Where("item_id = ?", define.ItemId).Find(&mixDefines)
-		// item.Mixs = make([]*entry.Mix, 0)
 		for _, m := range mixDefines {
 			mix := new(entry.Mix)
 			mix.ItemId = m.ChildId
 			mix.Num = m.Num
-			// item.Mixs = append(item.Mixs, mix)
+			item.Equip.Mixs = append(item.Equip.Mixs, mix)
 		}
 
 		m.items = append(m.items, item)
 	}
 
-	log.Debug("load items  db %v  mem %v", len(itemDefines), len(m.items))
+	cnt := 0
+	for _, item := range m.items {
+		if entry.ItemTypeEquip == item.Type {
+			cnt++
+		}
+	}
+
+	log.Debug("load equips  db %v  mem %v", len(equipDefines), cnt)
 }
 
 func (m *Module) LoadExp() {
@@ -695,7 +730,40 @@ func (m *Module) DoPersistent() {
 	m.PersistentGuanKa()
 	m.PersistentGroup()
 	m.PersistentGroupMember()
+	m.PersistentItems()
 	log.Debug("DoPersistent =====>  end")
+}
+
+func (m *Module) PersistentItems() {
+	cnt := 0
+
+	for uid, items := range m.playerItems {
+		for _, item := range items {
+			if item.IsDirty {
+				if entry.ItemTypeEquip == item.Type {
+					userEquip := UserEquip{
+						Uid:          uid,
+						EquipId:      item.ItemId,
+						ItemDefineId: item.Id,
+						HeroId:       item.Equip.HeroId,
+					}
+
+					var oldUserEquip UserEquip
+					m.db.Where("equip_id = ?", userEquip.EquipId).First(&oldUserEquip)
+					if userEquip.EquipId != oldUserEquip.EquipId {
+						m.db.Create(&userEquip)
+					} else {
+						m.db.Model(&userEquip).Where("equip_id = ?", userEquip.EquipId).Updates(userEquip)
+					}
+
+					cnt++
+					item.IsDirty = false
+				}
+			}
+		}
+	}
+
+	log.Debug("persistent groupMember %v ", cnt)
 }
 
 func (m *Module) PersistentGroupMember() {

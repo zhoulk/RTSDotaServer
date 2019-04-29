@@ -28,6 +28,7 @@ type Module struct {
 	playerChapters map[string][]*entry.Chapter
 	guanKas        []*entry.GuanKa
 	playerGuanKas  map[string][]*entry.GuanKa
+	playerItems    map[string][]*entry.Item
 	groups         []*entry.Group
 	battleCache    map[string]*entry.BattleInfo
 
@@ -40,6 +41,7 @@ func (m *Module) OnInit() {
 	m.playerHeros = make(map[string][]*entry.Hero)
 	m.playerChapters = make(map[string][]*entry.Chapter)
 	m.playerGuanKas = make(map[string][]*entry.GuanKa)
+	m.playerItems = make(map[string][]*entry.Item)
 	m.heros = make([]*entry.Hero, 0)
 	m.skills = make([]*entry.Skill, 0)
 	m.chapters = make([]*entry.Chapter, 0)
@@ -68,6 +70,8 @@ func (m *Module) EffectByEarn(player *entry.Player, earn *entry.Earn) {
 	for _, hero := range selelctHeros {
 		m.EffectHeroByEarn(hero, earn)
 	}
+	// 获得物品
+	m.EffectItemsByEarn(player, earn)
 }
 
 func (m *Module) EffectByExpend(player *entry.Player, expend *entry.Expend) {

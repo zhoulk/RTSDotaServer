@@ -17,11 +17,13 @@ type Item struct {
 	Equip    *Equip
 	HeroChip *HeroChip
 
-	HeroId string
 	ItemId string
+
+	IsDirty bool
 }
 
 type Equip struct {
+	HeroId string
 	Effect string
 	Mixs   []*Mix
 }

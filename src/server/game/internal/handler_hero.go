@@ -95,8 +95,8 @@ func handleHeroSkills(args []interface{}) {
 	a.WriteMsg(response)
 }
 
-func handleHeroItems(args []interface{}) {
-	log.Debug("game handleHeroItems")
+func handleHeroEquips(args []interface{}) {
+	log.Debug("game handleHeroEquips")
 
 }
 

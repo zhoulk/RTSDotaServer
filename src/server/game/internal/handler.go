@@ -12,7 +12,7 @@ func init() {
 	handler(&msg.HeroOwnRequest{}, handleOwnHero)
 	handler(&msg.HeroSelectRequest{}, handleHeroSelect)
 	handler(&msg.HeroUnSelectRequest{}, handleHeroUnSelect)
-	handler(&msg.HeroItemsRequest{}, handleHeroItems)
+	handler(&msg.HeroEquipsRequest{}, handleHeroEquips)
 	handler(&msg.HeroSkillsRequest{}, handleHeroSkills)
 	handler(&msg.HeroLotteryRequest{}, handleHeroLottery)
 
@@ -20,6 +20,7 @@ func init() {
 	handler(&msg.SkillUpgradeRequest{}, handleSkillUpgrade)
 
 	handler(&msg.ItemRequest{}, handleAllItem)
+	handler(&msg.EquipRequest{}, handleOwnEquip)
 
 	handler(&msg.ChapterRequest{}, handleAllChapter)
 	handler(&msg.GuanKaRequest{}, handleAllGuanKa)
