@@ -25,6 +25,13 @@ type Player struct {
 	Agent gate.Agent
 }
 
+func NewPlayer() *Player {
+	player := new(Player)
+	player.UserId = tool.UniqueId()
+	player.IsDirty = true
+	return player
+}
+
 func (p *Player) SetUserId(userId string) {
 	p.UserId = userId
 	p.IsDirty = true
@@ -65,12 +72,59 @@ type BaseInfo struct {
 	Level      int32
 	Military   int32
 
-	IsDirty bool
+	IsDirty  bool
+	IsNotify bool
+}
+
+func NewBaseInfo() *BaseInfo {
+	baseInfo := new(BaseInfo)
+	baseInfo.Gold = 10000
+	baseInfo.Diamond = 5000
+	baseInfo.Level = 1
+	baseInfo.Power = define.PLAYER_MAX_MP
+	baseInfo.MaxPower = define.PLAYER_MAX_MP
+	baseInfo.Exp = 0
+	baseInfo.LevelUpExp = 90
+
+	baseInfo.IsDirty = true
+
+	return baseInfo
 }
 
 func (b *BaseInfo) SetPower(power int32) {
 	b.Power = power
 	b.IsDirty = true
+	b.IsNotify = true
+}
+
+func (b *BaseInfo) SeGold(gold int32) {
+	b.Gold = gold
+	b.IsDirty = true
+	b.IsNotify = true
+}
+
+func (b *BaseInfo) SetDiamond(diamond int32) {
+	b.Diamond = diamond
+	b.IsDirty = true
+	b.IsNotify = true
+}
+
+func (b *BaseInfo) SetExp(exp int32) {
+	b.Exp = exp
+	b.IsDirty = true
+	b.IsNotify = true
+}
+
+func (b *BaseInfo) SetLevel(level int32) {
+	b.Level = level
+	b.IsDirty = true
+	b.IsNotify = true
+}
+
+func (b *BaseInfo) SetLevelUpExp(levelUpExp int32) {
+	b.LevelUpExp = levelUpExp
+	b.IsDirty = true
+	b.IsNotify = true
 }
 
 type ExtendInfo struct {
@@ -91,28 +145,6 @@ type ExtendInfo struct {
 	NeedBetterLotteryCnt       int32
 
 	IsDirty bool
-}
-
-func NewPlayer() *Player {
-	player := new(Player)
-	player.UserId = tool.UniqueId()
-	player.IsDirty = true
-	return player
-}
-
-func NewBaseInfo() *BaseInfo {
-	baseInfo := new(BaseInfo)
-	baseInfo.Gold = 10000
-	baseInfo.Diamond = 5000
-	baseInfo.Level = 1
-	baseInfo.Power = define.PLAYER_MAX_MP
-	baseInfo.MaxPower = define.PLAYER_MAX_MP
-	baseInfo.Exp = 0
-	baseInfo.LevelUpExp = 90
-
-	baseInfo.IsDirty = true
-
-	return baseInfo
 }
 
 func NewExtendInfo() *ExtendInfo {

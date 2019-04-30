@@ -7,9 +7,9 @@ import (
 
 func (m *Module) CalPlayerPower() {
 	for _, player := range m.players {
-		if player.BaseInfo.Power < player.BaseInfo.MaxPower {
-			player.BaseInfo.SetPower(player.BaseInfo.Power + 1)
-		}
+		// if player.BaseInfo.Power < player.BaseInfo.MaxPower {
+		player.BaseInfo.SetPower(player.BaseInfo.Power + 1)
+		// }
 	}
 }
 
