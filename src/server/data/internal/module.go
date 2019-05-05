@@ -31,6 +31,7 @@ type Module struct {
 	playerItems    map[string][]*entry.Item
 	groups         []*entry.Group
 	battleCache    map[string]*entry.BattleInfo
+	gameConfig     *entry.GameConfig
 
 	db *gorm.DB
 }
@@ -51,6 +52,7 @@ func (m *Module) OnInit() {
 	m.playerExpList = make([]int32, 0)
 	m.heroExpList = make([]int32, 0)
 	m.groups = make([]*entry.Group, 0)
+	m.gameConfig = new(entry.GameConfig)
 
 	m.battleCache = make(map[string]*entry.BattleInfo)
 
@@ -76,4 +78,8 @@ func (m *Module) EffectByEarn(player *entry.Player, earn *entry.Earn) {
 
 func (m *Module) EffectByExpend(player *entry.Player, expend *entry.Expend) {
 	player.BaseInfo.SetPower(player.BaseInfo.Power - expend.Power)
+}
+
+func (m *Module) GameConfig() *entry.GameConfig {
+	return m.gameConfig
 }

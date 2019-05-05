@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/name5566/leaf/gate"
+	"github.com/name5566/leaf/log"
 )
 
 type Player struct {
@@ -97,7 +98,8 @@ func (b *BaseInfo) SetPower(power int32) {
 	b.IsNotify = true
 }
 
-func (b *BaseInfo) SeGold(gold int32) {
+func (b *BaseInfo) SetGold(gold int32) {
+	log.Debug("SetGold  %v", gold)
 	b.Gold = gold
 	b.IsDirty = true
 	b.IsNotify = true
@@ -144,7 +146,8 @@ type ExtendInfo struct {
 	NeedGoodLotteryCnt         int32
 	NeedBetterLotteryCnt       int32
 
-	IsDirty bool
+	IsDirty  bool
+	IsNotify bool
 }
 
 func NewExtendInfo() *ExtendInfo {
@@ -167,6 +170,26 @@ func NewExtendInfo() *ExtendInfo {
 
 func (e *ExtendInfo) SetGroupId(groupId string) {
 	e.GroupId = groupId
+}
+
+func (e *ExtendInfo) SetFreeGoodLottery(cnt int32) {
+	e.FreeGoodLottery = cnt
+	e.IsNotify = true
+}
+
+func (e *ExtendInfo) SetFreeBetterLottery(cnt int32) {
+	e.FreeBetterLottery = cnt
+	e.IsNotify = true
+}
+
+func (e *ExtendInfo) SetGoodLotteryCnt(cnt int32) {
+	e.GoodLotteryCnt = cnt
+	e.IsNotify = true
+}
+
+func (e *ExtendInfo) SetBetterLotteryCnt(cnt int32) {
+	e.BetterLotteryCnt = cnt
+	e.IsNotify = true
 }
 
 func ConverPlayerToMsgPlayer(v *Player) *msg.Player {

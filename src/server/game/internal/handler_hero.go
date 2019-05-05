@@ -140,14 +140,16 @@ func handleRandomHero(args []interface{}) {
 			data.Module.InitHeroSkills(hero)
 			data.Module.SavePlayerHero(player, hero)
 
-			if player.ExtendInfo.FreeGoodLottery > 0 {
-				player.ExtendInfo.FreeGoodLottery--
+			if player.ExtendInfo.FreeGoodLottery > 0 && player.ExtendInfo.LastFreeGoodLotteryStamp+5*tool.SecondsPerMinute < time.Now().Unix() {
+				log.Debug("player.ExtendInfo.FreeGoodLottery === %v", player.ExtendInfo.FreeGoodLottery)
+				player.ExtendInfo.SetFreeGoodLottery(player.ExtendInfo.FreeGoodLottery - 1)
 				player.ExtendInfo.LastFreeGoodLotteryStamp = time.Now().Unix()
 			} else {
-				player.BaseInfo.Gold -= 1000
+				log.Debug("player.BaseInfo.Gold === %v", player.BaseInfo.Gold)
+				player.BaseInfo.SetGold(player.BaseInfo.Gold - 1000)
 			}
 
-			player.ExtendInfo.GoodLotteryCnt++
+			player.ExtendInfo.SetGoodLotteryCnt(player.ExtendInfo.GoodLotteryCnt + 1)
 
 			response.Hero = ConverHeroToMsgHero(hero)
 			response.Code = msg.ResponseCode_SUCCESS
@@ -175,14 +177,14 @@ func handleRandomHero(args []interface{}) {
 
 			data.Module.SavePlayerHero(player, hero)
 
-			if player.ExtendInfo.FreeBetterLottery > 0 {
-				player.ExtendInfo.FreeBetterLottery--
+			if player.ExtendInfo.FreeBetterLottery > 0 && player.ExtendInfo.LastFreeBetterLotteryStamp+tool.SecondsPerDay < time.Now().Unix() {
+				player.ExtendInfo.SetFreeBetterLottery(player.ExtendInfo.FreeBetterLottery - 1)
 				player.ExtendInfo.LastFreeBetterLotteryStamp = time.Now().Unix()
 			} else {
-				player.BaseInfo.Diamond -= 200
+				player.BaseInfo.SetDiamond(player.BaseInfo.Diamond - 200)
 			}
 
-			player.ExtendInfo.BetterLotteryCnt++
+			player.ExtendInfo.SetBetterLotteryCnt(player.ExtendInfo.BetterLotteryCnt + 1)
 
 			response.Hero = ConverHeroToMsgHero(hero)
 			response.Code = msg.ResponseCode_SUCCESS
@@ -202,7 +204,7 @@ func handleRandomHero(args []interface{}) {
 			hero.HeroId = tool.UniqueId()
 			hero.PlayerId = player.UserId
 			data.Module.SavePlayerHero(player, hero)
-			player.BaseInfo.Diamond -= 200
+			player.BaseInfo.SetDiamond(player.BaseInfo.Diamond - 200)
 
 			response.Hero = ConverHeroToMsgHero(hero)
 			response.Code = msg.ResponseCode_SUCCESS

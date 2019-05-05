@@ -3,6 +3,7 @@ package internal
 import (
 	"server/data/entry"
 	"server/tool"
+	"strconv"
 
 	"github.com/jinzhu/gorm"
 	"github.com/name5566/leaf/log"
@@ -167,6 +168,11 @@ func (m *Module) CreateTables() {
 			panic(err)
 		}
 	}
+	if !m.db.HasTable(&GameConfig{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&GameConfig{}).Error; err != nil {
+			panic(err)
+		}
+	}
 }
 
 func (m *Module) IntializeTables() {
@@ -178,6 +184,15 @@ func (m *Module) IntializeTables() {
 	m.IntializeEquipTable()
 	m.IntializeExpPlayerTable()
 	m.IntializeExpHeroTable()
+	m.InitalizeGameConfig()
+}
+
+func (m *Module) InitalizeGameConfig() {
+	config := GameConfig{
+		Key:   entry.GameConfigKey_GroupPrice,
+		Value: "500",
+	}
+	m.db.Where("key = ?", config.Key).FirstOrCreate(&config)
 }
 
 func (m *Module) IntializeZoneTable() {
@@ -344,7 +359,22 @@ func (m *Module) LoadFromDB() {
 	m.LoadUserChapter()
 	m.LoadUserGuanKa()
 	m.LoadUserEquip()
+	m.LoadGameConfig()
 	log.Debug("loading data from db end ...")
+}
+
+func (m *Module) LoadGameConfig() {
+	var configs []GameConfig
+	m.db.Find(&configs)
+	for _, define := range configs {
+		if entry.GameConfigKey_GroupPrice == define.Key {
+			num, err := strconv.Atoi(define.Value)
+			if err == nil {
+				m.gameConfig.GroupPrice = int32(num)
+			}
+		}
+	}
+	log.Debug("load game configs  db %v ", len(configs))
 }
 
 func (m *Module) LoadZone() {
@@ -1036,6 +1066,8 @@ func (m *Module) PersistentUser() {
 				MaxPower:   player.BaseInfo.MaxPower,
 				Military:   player.BaseInfo.Military,
 			}
+
+			log.Debug("userBaseInfo === %v", userBaseInfo)
 
 			var oldUserInfo UserBaseInfo
 			m.db.Where("uid = ?", userBaseInfo.Uid).First(&oldUserInfo)

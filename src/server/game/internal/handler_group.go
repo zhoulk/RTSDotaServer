@@ -47,7 +47,7 @@ func handleGroupCreate(args []interface{}) {
 	groupName := m.GetGroupName()
 	player := a.UserData().(*entry.Player)
 
-	if player.BaseInfo.Diamond < 500 {
+	if player.BaseInfo.Diamond < data.Module.GameConfig().GroupPrice {
 		response := new(msg.GroupCreateResponse)
 		response.Code = msg.ResponseCode_FAIL
 		response.Err = NewErr(define.GroupCreateDiamondErr)
@@ -75,15 +75,7 @@ func handleGroupMembers(args []interface{}) {
 	// // 输出收到的消息的内容
 	log.Debug("user %v", a.UserData())
 	groupID := m.GetGroupId()
-	player := a.UserData().(*entry.Player)
-
-	if player.BaseInfo.Diamond < 500 {
-		response := new(msg.GroupCreateResponse)
-		response.Code = msg.ResponseCode_FAIL
-		response.Err = NewErr(define.GroupCreateDiamondErr)
-		a.WriteMsg(response)
-		return
-	}
+	// player := a.UserData().(*entry.Player)
 
 	response := new(msg.GroupMembersResponse)
 	response.Code = msg.ResponseCode_SUCCESS

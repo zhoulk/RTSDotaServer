@@ -35,12 +35,14 @@ func executeOneMinite() {
 
 func notifyPlayerInfo() {
 	for _, player := range data.Module.AllPlayers() {
-		if player.BaseInfo != nil && player.BaseInfo.IsNotify {
+		if (player.BaseInfo != nil && player.BaseInfo.IsNotify) ||
+			(player.ExtendInfo != nil && player.ExtendInfo.IsNotify) {
 			msg := new(msg.PlayerInfoNotify)
 			msg.Player = entry.ConverPlayerToMsgPlayer(player)
 			if player.Agent != nil {
 				player.Agent.WriteMsg(msg)
 				player.BaseInfo.IsNotify = false
+				player.ExtendInfo.IsNotify = false
 			}
 		}
 	}

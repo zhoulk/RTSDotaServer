@@ -51,6 +51,7 @@ func (m *Module) CreateGroup(player *entry.Player, name string) *entry.Group {
 		player.ExtendInfo = entry.NewExtendInfo()
 	}
 	player.ExtendInfo.SetGroupId(group.GroupId)
+	player.BaseInfo.SetGold(player.BaseInfo.Gold - m.gameConfig.GroupPrice)
 
 	m.groups = append(m.groups, group)
 
