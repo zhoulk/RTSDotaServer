@@ -10,6 +10,7 @@ import (
 	"github.com/name5566/leaf/log"
 )
 
+// 获取自己参加的军团
 func handleGroupOwn(args []interface{}) {
 	log.Debug("game handleGroupOwn")
 
@@ -32,10 +33,12 @@ func handleGroupOwn(args []interface{}) {
 	a.WriteMsg(response)
 }
 
+// 获取军团列表
 func handleGroupList(args []interface{}) {
 	log.Debug("game handleGroupList")
 }
 
+// 创建军团
 func handleGroupCreate(args []interface{}) {
 	log.Debug("game handleGroupCreate")
 
@@ -66,6 +69,7 @@ func handleGroupCreate(args []interface{}) {
 	a.WriteMsg(response)
 }
 
+// 获取军团成员
 func handleGroupMembers(args []interface{}) {
 	log.Debug("game handleGroupMembers")
 
@@ -90,6 +94,11 @@ func handleGroupMembers(args []interface{}) {
 
 	a.WriteMsg(response)
 }
+
+// TODO 获取申请成员
+// TODO 通过、拒绝、剔除 成员
+// TODO 捐献贡献
+// TODO 升级军团科技
 
 // ConverGroupToMsgGroup ...
 func ConverGroupToMsgGroup(v *entry.Group) *msg.Group {

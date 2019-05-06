@@ -292,8 +292,8 @@ type UserHeroChip struct {
 }
 
 type GameConfig struct {
-	Key   string `gorm:"size:16;unique;not null"`
-	Value string `gorm:"size:64"`
+	ConfigKey   string `gorm:"size:16;unique;not null"`
+	ConfigValue string `gorm:"size:64"`
 
 	gorm.Model
 }

@@ -189,10 +189,10 @@ func (m *Module) IntializeTables() {
 
 func (m *Module) InitalizeGameConfig() {
 	config := GameConfig{
-		Key:   entry.GameConfigKey_GroupPrice,
-		Value: "500",
+		ConfigKey:   entry.GameConfigKey_GroupPrice,
+		ConfigValue: "500",
 	}
-	m.db.Where("key = ?", config.Key).FirstOrCreate(&config)
+	m.db.Where("config_key = ?", config.ConfigKey).FirstOrCreate(&config)
 }
 
 func (m *Module) IntializeZoneTable() {
@@ -367,8 +367,8 @@ func (m *Module) LoadGameConfig() {
 	var configs []GameConfig
 	m.db.Find(&configs)
 	for _, define := range configs {
-		if entry.GameConfigKey_GroupPrice == define.Key {
-			num, err := strconv.Atoi(define.Value)
+		if entry.GameConfigKey_GroupPrice == define.ConfigKey {
+			num, err := strconv.Atoi(define.ConfigValue)
 			if err == nil {
 				m.gameConfig.GroupPrice = int32(num)
 			}

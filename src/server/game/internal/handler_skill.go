@@ -10,6 +10,7 @@ import (
 	"github.com/name5566/leaf/log"
 )
 
+// 获取所有技能
 func handleAllSkill(args []interface{}) {
 	log.Debug("game handleAllSkill")
 
@@ -32,6 +33,7 @@ func handleAllSkill(args []interface{}) {
 	a.WriteMsg(response)
 }
 
+// 技能升级
 func handleSkillUpgrade(args []interface{}) {
 	log.Debug("game handleSkillUpgrade")
 

@@ -13,6 +13,7 @@ import (
 	"github.com/name5566/leaf/log"
 )
 
+// 查询英雄抽奖信息
 func handleHeroLottery(args []interface{}) {
 	log.Debug("game handleHeroLottery")
 	a := args[1].(gate.Agent)
@@ -41,6 +42,7 @@ func handleHeroLottery(args []interface{}) {
 	a.WriteMsg(response)
 }
 
+// 查询自己拥有的英雄
 func handleOwnHero(args []interface{}) {
 	log.Debug("game handleOwnHero")
 	//m := args[0].(*msg.HeroRequest)
@@ -64,6 +66,7 @@ func handleOwnHero(args []interface{}) {
 	a.WriteMsg(response)
 }
 
+// 查询一个英雄的技能
 func handleHeroSkills(args []interface{}) {
 	log.Debug("game handleHeroSkills")
 	m := args[0].(*msg.HeroSkillsRequest)
@@ -100,6 +103,7 @@ func handleHeroEquips(args []interface{}) {
 
 }
 
+// 随机英雄
 func handleRandomHero(args []interface{}) {
 	log.Debug("game handleRandomHero")
 
@@ -221,6 +225,7 @@ func handleRandomHero(args []interface{}) {
 	a.WriteMsg(response)
 }
 
+// 查询所有英雄
 func handleAllHero(args []interface{}) {
 	log.Debug("game handleAllHero")
 
@@ -243,6 +248,7 @@ func handleAllHero(args []interface{}) {
 	a.WriteMsg(response)
 }
 
+// 上阵一个英雄
 func handleHeroSelect(args []interface{}) {
 	log.Debug("game handleHeroSelect")
 	m := args[0].(*msg.HeroSelectRequest)
@@ -287,6 +293,7 @@ func handleHeroSelect(args []interface{}) {
 	a.WriteMsg(response)
 }
 
+// 下阵一个英雄
 func handleHeroUnSelect(args []interface{}) {
 	log.Debug("game handleHeroUnSelect")
 	m := args[0].(*msg.HeroUnSelectRequest)
@@ -315,6 +322,12 @@ func handleHeroUnSelect(args []interface{}) {
 
 	a.WriteMsg(response)
 }
+
+// TODO 英雄穿装备
+
+// TODO 英雄卸下装备
+
+
 
 func ConverHeroToMsgHero(v *entry.Hero) *msg.Hero {
 	hero := new(msg.Hero)

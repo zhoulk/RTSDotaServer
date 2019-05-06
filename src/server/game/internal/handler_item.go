@@ -9,6 +9,7 @@ import (
 	"github.com/name5566/leaf/log"
 )
 
+// 获取物品列表
 func handleAllItem(args []interface{}) {
 	log.Debug("game handleAllItem")
 
@@ -34,6 +35,7 @@ func handleAllItem(args []interface{}) {
 	a.WriteMsg(response)
 }
 
+// 获取自己的装备
 func handleOwnEquip(args []interface{}) {
 	log.Debug("game handleOwnEquip")
 
@@ -59,6 +61,13 @@ func handleOwnEquip(args []interface{}) {
 
 	a.WriteMsg(response)
 }
+
+// TODO 获取装备碎片
+// TODO 获取英雄碎片
+// TODO 获取自己的物品
+// TODO 合成英雄
+// TODO 合成装备
+// TODO 使用物品
 
 func ConverItemToMsgItem(v *entry.Item) *msg.Item {
 	item := new(msg.Item)
