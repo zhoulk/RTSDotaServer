@@ -55,6 +55,27 @@ func (m *Module) IsInGroup(player *entry.Player, groupId string) bool {
 	return false
 }
 
+func (m *Module) GroupApply(player *entry.Player, groupId string) {
+	if player == nil || len(player.UserId) == 0 {
+		return
+	}
+
+	gp := m.FindGroup(groupId)
+	if gp != nil {
+		exist := false
+		for _, mem := range gp.ApplyMembers {
+			if mem.UserId == player.UserId {
+				exist = true
+			}
+		}
+		if !exist {
+			mem := entry.NewGroupMember()
+			mem.SetUserId(player.UserId)
+			gp.ApplyMembers = append(gp.ApplyMembers, mem)
+		}
+	}
+}
+
 func (m *Module) CreateGroup(player *entry.Player, name string) *entry.Group {
 	if player == nil || len(player.UserId) == 0 {
 		return nil
@@ -70,6 +91,7 @@ func (m *Module) CreateGroup(player *entry.Player, name string) *entry.Group {
 	group.SetContriCurrent(0)
 	group.SetContriLevelUp(5000)
 	group.GroupMembers = make([]*entry.GroupMember, 0)
+	group.ApplyMembers = make([]*entry.GroupMember, 0)
 
 	member := entry.NewGroupMember()
 	member.SetUserId(player.UserId)

@@ -265,6 +265,13 @@ type GroupMember struct {
 	gorm.Model
 }
 
+type GroupApplyMember struct {
+	GroupId string `gorm:"size:64;not null"`
+	UserId  string `gorm:"size:64;unique;not null"`
+
+	gorm.Model
+}
+
 type UserEquip struct {
 	Uid          string `gorm:"size:64;not null"`
 	EquipId      string `gorm:"size:64;unique;not null"`

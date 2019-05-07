@@ -142,6 +142,8 @@ func handleGroupApply(args []interface{}) {
 		return
 	}
 
+	data.Module.GroupApply(player, groupId)
+
 	response := new(msg.GroupApplyResponse)
 	response.Code = msg.ResponseCode_SUCCESS
 	a.WriteMsg(response)

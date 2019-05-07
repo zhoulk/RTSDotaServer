@@ -12,6 +12,7 @@ type Group struct {
 	ContriLevelUp    int32
 
 	GroupMembers []*GroupMember
+	ApplyMembers []*GroupMember
 
 	IsDirty bool
 }

@@ -153,6 +153,11 @@ func (m *Module) CreateTables() {
 			panic(err)
 		}
 	}
+	if !m.db.HasTable(&GroupApplyMember{}) {
+		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&GroupApplyMember{}).Error; err != nil {
+			panic(err)
+		}
+	}
 	if !m.db.HasTable(&UserEquip{}) {
 		if err := m.db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&UserEquip{}).Error; err != nil {
 			panic(err)
@@ -360,7 +365,25 @@ func (m *Module) LoadFromDB() {
 	m.LoadUserGuanKa()
 	m.LoadUserEquip()
 	m.LoadGameConfig()
+	m.LoadGroup()
 	log.Debug("loading data from db end ...")
+}
+
+func (m *Module) LoadGroup() {
+	var groups []*Group
+	m.db.Find(&groups)
+	for _, define := range groups {
+		g := new(entry.Group)
+		g.GroupId = define.GroupId
+		g.GroupName = define.GroupName
+		g.GroupLevel = define.GroupLevel
+		g.GroupDeclaration = define.GroupDeclaration
+		g.MemberCnt = define.MemberCnt
+		g.MemberTotal = define.MemberTotal
+
+		m.groups = append(m.groups, g)
+	}
+	log.Debug("load groups  db %v  mem %v", len(groups), len(m.groups))
 }
 
 func (m *Module) LoadGameConfig() {
@@ -810,6 +833,7 @@ func (m *Module) DoPersistent() {
 	m.PersistentGuanKa()
 	m.PersistentGroup()
 	m.PersistentGroupMember()
+	m.PersistentGroupApplyMember()
 	m.PersistentItems()
 	log.Debug("DoPersistent =====>  end")
 }
@@ -846,6 +870,34 @@ func (m *Module) PersistentItems() {
 	log.Debug("persistent user equip %v ", cnt)
 }
 
+func (m *Module) PersistentGroupApplyMember() {
+	cnt := 0
+	for _, group := range m.groups {
+		if group.ApplyMembers != nil {
+			for _, groupMember := range group.ApplyMembers {
+				if groupMember.IsDirty {
+					gpm := GroupApplyMember{
+						GroupId: group.GroupId,
+						UserId:  groupMember.UserId,
+					}
+
+					var oldGroupApplyMember GroupApplyMember
+					m.db.Where("group_id = ? && user_id = ?", gpm.GroupId, gpm.UserId).First(&oldGroupApplyMember)
+					if gpm.UserId != oldGroupApplyMember.UserId {
+						m.db.Create(&gpm)
+					} else {
+						m.db.Model(&gpm).Where("group_id = ? && user_id = ?", gpm.GroupId, gpm.UserId).Updates(gpm)
+					}
+
+					cnt++
+					groupMember.IsDirty = false
+				}
+			}
+		}
+	}
+	log.Debug("persistent groupApplyMember %v ", cnt)
+}
+
 func (m *Module) PersistentGroupMember() {
 	cnt := 0
 	for _, group := range m.groups {
@@ -865,7 +917,7 @@ func (m *Module) PersistentGroupMember() {
 					if gpm.UserId != oldGroupMember.UserId {
 						m.db.Create(&gpm)
 					} else {
-						m.db.Model(&gpm).Where("user_id = ?", gpm.GroupId).Updates(gpm)
+						m.db.Model(&gpm).Where("user_id = ?", gpm.UserId).Updates(gpm)
 					}
 
 					cnt++
