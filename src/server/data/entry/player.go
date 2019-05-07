@@ -199,6 +199,9 @@ func ConverPlayerToMsgPlayer(v *Player) *msg.Player {
 	if v.BaseInfo != nil {
 		player.BaseInfo = ConverBaseInfoToMsgBaseInfo(v.BaseInfo)
 	}
+	if v.ExtendInfo != nil {
+		player.ExtendInfo = ConverExtendInfoToMsgExtendInfo(v.ExtendInfo)
+	}
 	return player
 }
 
@@ -212,4 +215,10 @@ func ConverBaseInfoToMsgBaseInfo(v *BaseInfo) *msg.BaseInfo {
 	baseInfo.LevelUpExp = v.LevelUpExp
 	baseInfo.MaxPower = v.MaxPower
 	return baseInfo
+}
+
+func ConverExtendInfoToMsgExtendInfo(v *ExtendInfo) *msg.ExtendInfo {
+	extendInfo := new(msg.ExtendInfo)
+	extendInfo.GroupId = v.GroupId
+	return extendInfo
 }

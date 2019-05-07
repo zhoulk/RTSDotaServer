@@ -36,6 +36,22 @@ func handleGroupOwn(args []interface{}) {
 // 获取军团列表
 func handleGroupList(args []interface{}) {
 	log.Debug("game handleGroupList")
+
+	a := args[1].(gate.Agent)
+
+	// // 输出收到的消息的内容
+	log.Debug("user %v", a.UserData())
+
+	response := new(msg.GroupListResponse)
+	response.Code = msg.ResponseCode_SUCCESS
+
+	groups := data.Module.AllGroups()
+	response.Groups = make([]*msg.Group, 0)
+	for _, group := range groups {
+		response.Groups = append(response.Groups, ConverGroupToMsgGroup(group))
+	}
+
+	a.WriteMsg(response)
 }
 
 // 创建军团
@@ -95,9 +111,75 @@ func handleGroupMembers(args []interface{}) {
 	a.WriteMsg(response)
 }
 
+// TODO 申请加入
+func handleGroupApply(args []interface{}) {
+	log.Debug("game handleGroupApply")
+
+	m := args[0].(*msg.GroupApplyRequest)
+	a := args[1].(gate.Agent)
+
+	// // 输出收到的消息的内容
+	log.Debug("user %v", a.UserData())
+	player := a.UserData().(*entry.Player)
+
+	groupId := m.GroupId
+
+	gp := data.Module.FindGroup(groupId)
+	if gp == nil {
+		response := new(msg.GroupApplyResponse)
+		response.Code = msg.ResponseCode_FAIL
+		response.Err = NewErr(define.GroupApplyExistErr)
+		a.WriteMsg(response)
+		return
+	}
+
+	res := data.Module.IsInGroup(player, groupId)
+	if res {
+		response := new(msg.GroupApplyResponse)
+		response.Code = msg.ResponseCode_FAIL
+		response.Err = NewErr(define.GroupApplyIsInErr)
+		a.WriteMsg(response)
+		return
+	}
+
+	response := new(msg.GroupApplyResponse)
+	response.Code = msg.ResponseCode_SUCCESS
+	a.WriteMsg(response)
+}
+
 // TODO 获取申请成员
+func handleGroupApplyMembers(args []interface{}) {
+	log.Debug("game handleGroupApply")
+
+	// m := args[0].(*msg.GroupMembersRequest)
+	// a := args[1].(gate.Agent)
+
+	// // // 输出收到的消息的内容
+	// log.Debug("user %v", a.UserData())
+}
+
 // TODO 通过、拒绝、剔除 成员
+func handleGroupOper(args []interface{}) {
+	log.Debug("game handleGroupApply")
+
+	// m := args[0].(*msg.GroupMembersRequest)
+	// a := args[1].(gate.Agent)
+
+	// // // 输出收到的消息的内容
+	// log.Debug("user %v", a.UserData())
+}
+
 // TODO 捐献贡献
+func handleGroupContri(args []interface{}) {
+	log.Debug("game handleGroupApply")
+
+	// m := args[0].(*msg.GroupMembersRequest)
+	// a := args[1].(gate.Agent)
+
+	// // // 输出收到的消息的内容
+	// log.Debug("user %v", a.UserData())
+}
+
 // TODO 升级军团科技
 
 // ConverGroupToMsgGroup ...

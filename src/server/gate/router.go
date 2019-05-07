@@ -39,5 +39,9 @@ func init() {
 	msg.Processor.SetRouter(&msg.GroupListRequest{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.GroupCreateRequest{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.GroupMembersRequest{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.GroupApplyRequest{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.GroupApplyMembersRequest{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.GroupContriRequest{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.GroupOperRequest{}, game.ChanRPC)
 
 }

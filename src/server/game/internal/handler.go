@@ -35,6 +35,10 @@ func init() {
 	handler(&msg.GroupListRequest{}, handleGroupList)
 	handler(&msg.GroupCreateRequest{}, handleGroupCreate)
 	handler(&msg.GroupMembersRequest{}, handleGroupMembers)
+	handler(&msg.GroupApplyRequest{}, handleGroupApply)
+	handler(&msg.GroupApplyMembersRequest{}, handleGroupApplyMembers)
+	handler(&msg.GroupOperRequest{}, handleGroupOper)
+	handler(&msg.GroupContriRequest{}, handleGroupContri)
 
 	handleCrontab()
 }

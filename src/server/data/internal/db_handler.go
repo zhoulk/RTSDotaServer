@@ -405,6 +405,17 @@ func (m *Module) LoadPlayer() {
 		player.LogoutTime = user.LogoutTime
 		m.SavePlayer(player)
 
+		var groupMember GroupMember
+		m.db.Where("user_id = ?", user.Uid).First(&groupMember)
+		if len(groupMember.UserId) > 0 {
+			extendInfo := player.ExtendInfo
+			if extendInfo == nil {
+				extendInfo = new(entry.ExtendInfo)
+			}
+			extendInfo.GroupId = groupMember.GroupId
+			player.ExtendInfo = extendInfo
+		}
+
 		tempPlayers[user.Uid] = player
 	}
 

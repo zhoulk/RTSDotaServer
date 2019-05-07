@@ -25,6 +25,8 @@ const (
 
 	GroupCreateDiamondErr int32 = 400
 	GroupCreateExistErr   int32 = 401
+	GroupApplyExistErr    int32 = 402
+	GroupApplyIsInErr     int32 = 403
 )
 
 var ERRMAP map[int32]string = map[int32]string{
@@ -52,6 +54,8 @@ var ERRMAP map[int32]string = map[int32]string{
 
 	GroupCreateDiamondErr: "钻石不足",
 	GroupCreateExistErr:   "已经拥有一个军团",
+	GroupApplyExistErr:    "军团不存在",
+	GroupApplyIsInErr:     "你已经加入该军团",
 }
 
 const (

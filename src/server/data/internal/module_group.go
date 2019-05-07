@@ -25,6 +25,36 @@ func (m *Module) OwnGroup(player *entry.Player) *entry.Group {
 	return nil
 }
 
+func (m *Module) AllGroups() []*entry.Group {
+	return m.groups
+}
+
+func (m *Module) FindGroup(groupId string) *entry.Group {
+	for _, gp := range m.groups {
+		if gp.GroupId == groupId {
+			return gp
+		}
+	}
+	return nil
+}
+
+func (m *Module) IsInGroup(player *entry.Player, groupId string) bool {
+	if player == nil || len(player.UserId) == 0 {
+		return false
+	}
+
+	mems := m.GroupMembers(groupId)
+	if mems != nil {
+		for _, mem := range mems {
+			if mem.UserId == player.UserId {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func (m *Module) CreateGroup(player *entry.Player, name string) *entry.Group {
 	if player == nil || len(player.UserId) == 0 {
 		return nil
