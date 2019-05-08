@@ -2,6 +2,7 @@ package internal
 
 import (
 	"server/data/entry"
+	"server/define"
 	"server/tool"
 )
 
@@ -111,10 +112,72 @@ func (m *Module) CreateGroup(player *entry.Player, name string) *entry.Group {
 }
 
 func (m *Module) GroupMembers(groupId string) []*entry.GroupMember {
+	members := make([]*entry.GroupMember, 0)
 	for _, group := range m.groups {
 		if group.GroupId == groupId {
-			return group.GroupMembers
+			for _, mem := range group.GroupMembers {
+				player := m.FindPlayer(mem.UserId, "")
+				mem.Level = player.BaseInfo.Level
+				mem.Name = player.Name
+				mem.Power = player.BaseInfo.Military
+				members = append(members, mem)
+			}
+			break
 		}
 	}
-	return nil
+	return members
+}
+
+func (m *Module) GroupApplyMembers(groupId string) []*entry.GroupMember {
+	members := make([]*entry.GroupMember, 0)
+	for _, group := range m.groups {
+		if group.GroupId == groupId {
+			for _, mem := range group.ApplyMembers {
+				player := m.FindPlayer(mem.UserId, "")
+				mem.Level = player.BaseInfo.Level
+				mem.Name = player.Name
+				mem.Power = player.BaseInfo.Military
+				members = append(members, mem)
+			}
+			break
+		}
+	}
+	return members
+}
+
+func (m *Module) GroupAgree(player *entry.Player, groupId string) int32 {
+	if player == nil || len(player.UserId) == 0 {
+		return 0
+	}
+
+	gp := m.FindGroup(groupId)
+	if gp == nil {
+		return define.GroupOperExistErr
+	}
+	isIn := m.IsInGroup(player, groupId)
+	if isIn {
+		return define.GroupOperIsInErr
+	}
+
+	if gp.MemberCnt >= gp.MemberTotal {
+		return define.GroupOperMemberFullErr
+	}
+
+	index := -1
+	for i, mem := range gp.ApplyMembers {
+		if mem.UserId == player.UserId {
+			mem.SetLastOper(define.GroupOper_Agree)
+			index = i
+		}
+	}
+	if index == -1 {
+		return define.GroupOperNoApplyErr
+	}
+
+	member := entry.NewGroupMember()
+	member.SetUserId(player.UserId)
+	member.SetJob(entry.GroupMemberJob_Member)
+	gp.GroupMembers = append(gp.GroupMembers, member)
+
+	return 0
 }

@@ -95,7 +95,7 @@ func handleGroupMembers(args []interface{}) {
 	// // 输出收到的消息的内容
 	log.Debug("user %v", a.UserData())
 	groupID := m.GetGroupId()
-	// player := a.UserData().(*entry.Player)
+	log.Debug("groupId === %v", groupID)
 
 	response := new(msg.GroupMembersResponse)
 	response.Code = msg.ResponseCode_SUCCESS
@@ -111,7 +111,7 @@ func handleGroupMembers(args []interface{}) {
 	a.WriteMsg(response)
 }
 
-// TODO 申请加入
+// 申请加入
 func handleGroupApply(args []interface{}) {
 	log.Debug("game handleGroupApply")
 
@@ -149,26 +149,59 @@ func handleGroupApply(args []interface{}) {
 	a.WriteMsg(response)
 }
 
-// TODO 获取申请成员
+// 获取申请成员
 func handleGroupApplyMembers(args []interface{}) {
 	log.Debug("game handleGroupApply")
 
-	// m := args[0].(*msg.GroupMembersRequest)
-	// a := args[1].(gate.Agent)
+	m := args[0].(*msg.GroupApplyMembersRequest)
+	a := args[1].(gate.Agent)
 
-	// // // 输出收到的消息的内容
-	// log.Debug("user %v", a.UserData())
+	// // 输出收到的消息的内容
+	log.Debug("user %v", a.UserData())
+	groupID := m.GetGroupId()
+
+	response := new(msg.GroupApplyMembersResponse)
+	response.Code = msg.ResponseCode_SUCCESS
+
+	members := data.Module.GroupApplyMembers(groupID)
+	response.Members = make([]*msg.GroupMember, 0)
+	if members != nil {
+		for _, member := range members {
+			response.Members = append(response.Members, ConvertGroupMemberToMsgGroupMember(member))
+		}
+	}
+
+	a.WriteMsg(response)
 }
 
 // TODO 通过、拒绝、剔除 成员
 func handleGroupOper(args []interface{}) {
 	log.Debug("game handleGroupApply")
 
-	// m := args[0].(*msg.GroupMembersRequest)
-	// a := args[1].(gate.Agent)
+	m := args[0].(*msg.GroupOperRequest)
+	a := args[1].(gate.Agent)
 
-	// // // 输出收到的消息的内容
-	// log.Debug("user %v", a.UserData())
+	// 输出收到的消息的内容
+	player := a.UserData().(*entry.Player)
+
+	response := new(msg.GroupOperResponse)
+	switch m.Oper {
+	case define.GroupOper_Agree:
+		code := data.Module.GroupAgree(player, m.GroupId)
+		if code == 0 {
+			response.Code = msg.ResponseCode_SUCCESS
+		} else {
+			response.Code = msg.ResponseCode_FAIL
+			response.Err = NewErr(code)
+		}
+		break
+	case define.GroupOper_Reject:
+		break
+	case define.GroupOper_Del:
+		break
+	}
+
+	a.WriteMsg(response)
 }
 
 // TODO 捐献贡献
@@ -181,6 +214,8 @@ func handleGroupContri(args []interface{}) {
 	// // // 输出收到的消息的内容
 	// log.Debug("user %v", a.UserData())
 }
+
+// TODO 改变成员职位
 
 // TODO 升级军团科技
 

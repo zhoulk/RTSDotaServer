@@ -68,6 +68,12 @@ func (g *Group) SetContriLevelUp(contriLevelUp int32) {
 	g.IsDirty = true
 }
 
+const (
+	GroupMemberJob_Member       int32 = 1
+	GroupMemberJob_SecondLeader int32 = 2
+	GroupMemberJob_Leader       int32 = 3
+)
+
 type GroupMember struct {
 	UserId      string
 	Name        string
@@ -78,7 +84,8 @@ type GroupMember struct {
 	Job         int32
 	OffLineTime int32
 
-	IsDirty bool
+	LastOper int32
+	IsDirty  bool
 }
 
 func NewGroupMember() *GroupMember {
@@ -112,5 +119,10 @@ func (m *GroupMember) SetContriTotal(contriTotal int32) {
 
 func (m *GroupMember) SetJob(job int32) {
 	m.Job = job
+	m.IsDirty = true
+}
+
+func (m *GroupMember) SetLastOper(oper int32) {
+	m.LastOper = oper
 	m.IsDirty = true
 }

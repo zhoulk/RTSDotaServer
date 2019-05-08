@@ -266,8 +266,9 @@ type GroupMember struct {
 }
 
 type GroupApplyMember struct {
-	GroupId string `gorm:"size:64;not null"`
-	UserId  string `gorm:"size:64;unique;not null"`
+	GroupId  string `gorm:"size:64;not null"`
+	UserId   string `gorm:"size:64;unique;not null"`
+	LastOper int32
 
 	gorm.Model
 }

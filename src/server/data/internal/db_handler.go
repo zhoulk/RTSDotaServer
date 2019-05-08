@@ -366,7 +366,54 @@ func (m *Module) LoadFromDB() {
 	m.LoadUserEquip()
 	m.LoadGameConfig()
 	m.LoadGroup()
+	m.LoadGroupMember()
+	m.LoadApplyMember()
 	log.Debug("loading data from db end ...")
+}
+
+func (m *Module) LoadApplyMember() {
+	dbCnt := 0
+	memCnt := 0
+	for _, gp := range m.groups {
+		var members []*GroupApplyMember
+		m.db.Where("group_id = ?", gp.GroupId).Find(&members)
+
+		gp.ApplyMembers = make([]*entry.GroupMember, 0)
+		for _, define := range members {
+			m := new(entry.GroupMember)
+			m.UserId = define.UserId
+
+			gp.ApplyMembers = append(gp.ApplyMembers, m)
+		}
+
+		dbCnt += len(members)
+		memCnt += len(gp.ApplyMembers)
+	}
+	log.Debug("load group apply members  db %v  mem %v", dbCnt, memCnt)
+}
+
+func (m *Module) LoadGroupMember() {
+	dbCnt := 0
+	memCnt := 0
+	for _, gp := range m.groups {
+		var members []*GroupMember
+		m.db.Where("group_id = ?", gp.GroupId).Find(&members)
+
+		gp.GroupMembers = make([]*entry.GroupMember, 0)
+		for _, define := range members {
+			m := new(entry.GroupMember)
+			m.UserId = define.UserId
+			m.ContriToday = define.ContriToday
+			m.ContriTotal = define.ContriTotal
+			m.Job = define.Job
+
+			gp.GroupMembers = append(gp.GroupMembers, m)
+		}
+
+		dbCnt += len(members)
+		memCnt += len(gp.GroupMembers)
+	}
+	log.Debug("load group members  db %v  mem %v", dbCnt, memCnt)
 }
 
 func (m *Module) LoadGroup() {
