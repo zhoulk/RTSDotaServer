@@ -183,11 +183,12 @@ func handleGroupOper(args []interface{}) {
 
 	// 输出收到的消息的内容
 	player := a.UserData().(*entry.Player)
+	log.Debug("game handleGroupApply  oper === %v", m.Oper)
 
 	response := new(msg.GroupOperResponse)
 	switch m.Oper {
 	case define.GroupOper_Agree:
-		code := data.Module.GroupAgree(player, m.GroupId)
+		code := data.Module.GroupAgree(player, m.GroupId, m.UserId)
 		if code == 0 {
 			response.Code = msg.ResponseCode_SUCCESS
 		} else {
@@ -196,13 +197,29 @@ func handleGroupOper(args []interface{}) {
 		}
 		break
 	case define.GroupOper_Reject:
+		code := data.Module.GroupReject(player, m.GroupId, m.UserId)
+		if code == 0 {
+			response.Code = msg.ResponseCode_SUCCESS
+		} else {
+			response.Code = msg.ResponseCode_FAIL
+			response.Err = NewErr(code)
+		}
 		break
 	case define.GroupOper_Del:
+		code := data.Module.GroupDel(player, m.GroupId, m.UserId)
+		if code == 0 {
+			response.Code = msg.ResponseCode_SUCCESS
+		} else {
+			response.Code = msg.ResponseCode_FAIL
+			response.Err = NewErr(code)
+		}
 		break
 	}
 
 	a.WriteMsg(response)
 }
+
+// TODO 退出军团
 
 // TODO 捐献贡献
 func handleGroupContri(args []interface{}) {

@@ -382,6 +382,7 @@ func (m *Module) LoadApplyMember() {
 		for _, define := range members {
 			m := new(entry.GroupMember)
 			m.UserId = define.UserId
+			m.LastOper = define.LastOper
 
 			gp.ApplyMembers = append(gp.ApplyMembers, m)
 		}
@@ -406,6 +407,7 @@ func (m *Module) LoadGroupMember() {
 			m.ContriToday = define.ContriToday
 			m.ContriTotal = define.ContriTotal
 			m.Job = define.Job
+			m.LastOper = define.LastOper
 
 			gp.GroupMembers = append(gp.GroupMembers, m)
 		}
@@ -924,8 +926,9 @@ func (m *Module) PersistentGroupApplyMember() {
 			for _, groupMember := range group.ApplyMembers {
 				if groupMember.IsDirty {
 					gpm := GroupApplyMember{
-						GroupId: group.GroupId,
-						UserId:  groupMember.UserId,
+						GroupId:  group.GroupId,
+						UserId:   groupMember.UserId,
+						LastOper: groupMember.LastOper,
 					}
 
 					var oldGroupApplyMember GroupApplyMember
@@ -957,6 +960,7 @@ func (m *Module) PersistentGroupMember() {
 						ContriToday: groupMember.ContriToday,
 						ContriTotal: groupMember.ContriTotal,
 						Job:         groupMember.Job,
+						LastOper:    groupMember.LastOper,
 					}
 
 					var oldGroupMember GroupMember

@@ -261,13 +261,14 @@ type GroupMember struct {
 	ContriToday int32
 	ContriTotal int32
 	Job         int32
+	LastOper    int32
 
 	gorm.Model
 }
 
 type GroupApplyMember struct {
 	GroupId  string `gorm:"size:64;not null"`
-	UserId   string `gorm:"size:64;unique;not null"`
+	UserId   string `gorm:"size:64;not null"`
 	LastOper int32
 
 	gorm.Model

@@ -44,10 +44,14 @@ func (m *Module) IsInGroup(player *entry.Player, groupId string) bool {
 		return false
 	}
 
+	return m.IsUserInGroup(player.UserId, groupId)
+}
+
+func (m *Module) IsUserInGroup(userId string, groupId string) bool {
 	mems := m.GroupMembers(groupId)
 	if mems != nil {
 		for _, mem := range mems {
-			if mem.UserId == player.UserId {
+			if mem.UserId == userId {
 				return true
 			}
 		}
@@ -98,6 +102,7 @@ func (m *Module) CreateGroup(player *entry.Player, name string) *entry.Group {
 	member.SetUserId(player.UserId)
 	member.SetLevel(player.BaseInfo.Level)
 	member.SetName(player.Name)
+	member.SetJob(entry.GroupMemberJob_Leader)
 	group.GroupMembers = append(group.GroupMembers, member)
 
 	if player.ExtendInfo == nil {
@@ -116,11 +121,13 @@ func (m *Module) GroupMembers(groupId string) []*entry.GroupMember {
 	for _, group := range m.groups {
 		if group.GroupId == groupId {
 			for _, mem := range group.GroupMembers {
-				player := m.FindPlayer(mem.UserId, "")
-				mem.Level = player.BaseInfo.Level
-				mem.Name = player.Name
-				mem.Power = player.BaseInfo.Military
-				members = append(members, mem)
+				if mem.LastOper == define.GroupOper_None {
+					player := m.FindPlayer(mem.UserId, "")
+					mem.Level = player.BaseInfo.Level
+					mem.Name = player.Name
+					mem.Power = player.BaseInfo.Military
+					members = append(members, mem)
+				}
 			}
 			break
 		}
@@ -133,11 +140,13 @@ func (m *Module) GroupApplyMembers(groupId string) []*entry.GroupMember {
 	for _, group := range m.groups {
 		if group.GroupId == groupId {
 			for _, mem := range group.ApplyMembers {
-				player := m.FindPlayer(mem.UserId, "")
-				mem.Level = player.BaseInfo.Level
-				mem.Name = player.Name
-				mem.Power = player.BaseInfo.Military
-				members = append(members, mem)
+				if mem.LastOper == define.GroupOper_None {
+					player := m.FindPlayer(mem.UserId, "")
+					mem.Level = player.BaseInfo.Level
+					mem.Name = player.Name
+					mem.Power = player.BaseInfo.Military
+					members = append(members, mem)
+				}
 			}
 			break
 		}
@@ -145,7 +154,7 @@ func (m *Module) GroupApplyMembers(groupId string) []*entry.GroupMember {
 	return members
 }
 
-func (m *Module) GroupAgree(player *entry.Player, groupId string) int32 {
+func (m *Module) GroupAgree(player *entry.Player, groupId string, userId string) int32 {
 	if player == nil || len(player.UserId) == 0 {
 		return 0
 	}
@@ -154,7 +163,7 @@ func (m *Module) GroupAgree(player *entry.Player, groupId string) int32 {
 	if gp == nil {
 		return define.GroupOperExistErr
 	}
-	isIn := m.IsInGroup(player, groupId)
+	isIn := m.IsUserInGroup(userId, groupId)
 	if isIn {
 		return define.GroupOperIsInErr
 	}
@@ -163,9 +172,21 @@ func (m *Module) GroupAgree(player *entry.Player, groupId string) int32 {
 		return define.GroupOperMemberFullErr
 	}
 
+	isLeader := false
+	for _, mem := range gp.GroupMembers {
+		if mem.UserId == player.UserId {
+			if mem.Job == entry.GroupMemberJob_Leader || mem.Job == entry.GroupMemberJob_SecondLeader {
+				isLeader = true
+			}
+		}
+	}
+	if !isLeader {
+		return define.GroupOperNoLeaderErr
+	}
+
 	index := -1
 	for i, mem := range gp.ApplyMembers {
-		if mem.UserId == player.UserId {
+		if mem.UserId == userId {
 			mem.SetLastOper(define.GroupOper_Agree)
 			index = i
 		}
@@ -175,9 +196,87 @@ func (m *Module) GroupAgree(player *entry.Player, groupId string) int32 {
 	}
 
 	member := entry.NewGroupMember()
-	member.SetUserId(player.UserId)
+	member.SetUserId(userId)
 	member.SetJob(entry.GroupMemberJob_Member)
 	gp.GroupMembers = append(gp.GroupMembers, member)
+
+	p := m.FindPlayer(userId, "")
+	p.ExtendInfo.SetGroupId(groupId)
+
+	return 0
+}
+
+func (m *Module) GroupReject(player *entry.Player, groupId string, userId string) int32 {
+	if player == nil || len(player.UserId) == 0 {
+		return 0
+	}
+
+	gp := m.FindGroup(groupId)
+	if gp == nil {
+		return define.GroupOperExistErr
+	}
+	isIn := m.IsUserInGroup(userId, groupId)
+	if isIn {
+		return define.GroupOperIsInErr
+	}
+
+	isLeader := false
+	for _, mem := range gp.GroupMembers {
+		if mem.UserId == player.UserId {
+			if mem.Job == entry.GroupMemberJob_Leader || mem.Job == entry.GroupMemberJob_SecondLeader {
+				isLeader = true
+			}
+		}
+	}
+	if !isLeader {
+		return define.GroupOperNoLeaderErr
+	}
+
+	index := -1
+	for i, mem := range gp.ApplyMembers {
+		if mem.UserId == userId {
+			mem.SetLastOper(define.GroupOper_Reject)
+			index = i
+		}
+	}
+	if index == -1 {
+		return define.GroupOperNoApplyErr
+	}
+
+	return 0
+}
+
+func (m *Module) GroupDel(player *entry.Player, groupId string, userId string) int32 {
+	if player == nil || len(player.UserId) == 0 {
+		return 0
+	}
+
+	gp := m.FindGroup(groupId)
+	if gp == nil {
+		return define.GroupOperExistErr
+	}
+	isIn := m.IsUserInGroup(userId, groupId)
+	if !isIn {
+		return define.GroupOperIsNotInErr
+	}
+
+	isLeader := false
+	for _, mem := range gp.GroupMembers {
+		if mem.UserId == player.UserId {
+			if mem.Job == entry.GroupMemberJob_Leader || mem.Job == entry.GroupMemberJob_SecondLeader {
+				isLeader = true
+			}
+		}
+	}
+	if !isLeader {
+		return define.GroupOperNoLeaderErr
+	}
+
+	for _, mem := range gp.GroupMembers {
+		if mem.UserId == userId {
+			mem.SetLastOper(define.GroupOper_Del)
+		}
+	}
 
 	return 0
 }

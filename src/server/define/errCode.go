@@ -31,6 +31,8 @@ const (
 	GroupOperIsInErr       int32 = 405
 	GroupOperNoApplyErr    int32 = 406
 	GroupOperMemberFullErr int32 = 407
+	GroupOperNoLeaderErr   int32 = 408
+	GroupOperIsNotInErr    int32 = 409
 )
 
 var ERRMAP map[int32]string = map[int32]string{
@@ -64,6 +66,8 @@ var ERRMAP map[int32]string = map[int32]string{
 	GroupOperIsInErr:       "你已经加入该军团",
 	GroupOperNoApplyErr:    "申请不存在",
 	GroupOperMemberFullErr: "军团已经满员",
+	GroupOperNoLeaderErr:   "没有操作权限",
+	GroupOperIsNotInErr:    "还未加入该军团",
 }
 
 const (
